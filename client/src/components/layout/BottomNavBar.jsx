@@ -1,0 +1,144 @@
+/**
+ * BottomNavBar (A2)
+ * 5탭 균등: 홈·결제매장·혜택·이용내역·MY
+ * QR 중앙 원형 제거 — QR 진입은 잔액 카드 3번 슬롯으로 이동
+ * Strategy: Nielsen #4 consistency, Shneiderman #1
+ */
+
+import { cloneElement } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { Home, Store, Gift, Receipt, User } from 'lucide-react'
+import { colors, typography, layout, spacing, md3Shape } from '../../tokens/tokens'
+import { useTypography } from '../../hooks/useTypography'
+import { usePlatform } from '../../hooks/usePlatform'
+
+export default function BottomNavBar() {
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  function getActiveKey() {
+    const p = location.pathname
+    if (p === '/') return 'home'
+    if (p.startsWith('/store')) return 'store'
+    if (p.startsWith('/support')) return 'support'
+    if (p.startsWith('/history')) return 'history'
+    if (p.startsWith('/my')) return 'my'
+    return ''
+  }
+  const activeKey = getActiveKey()
+  const isAndroid = usePlatform() === 'android'
+
+  // MD3 2025에서 기존 navigation bar는 deprecated되고 높이가 더 짧은
+  // flexible navigation bar로 바뀌었다. 안드로이드는 짧은 높이를 쓴다.
+  const NAV_HEIGHT = isAndroid ? '44px' : '49px'
+
+  return (
+    <div
+      className="glass glass-top-only"
+      style={{
+      position: 'fixed',
+      bottom: 0,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      width: '100%',
+      maxWidth: layout.viewport,
+      zIndex: 200,
+      display: 'flex',
+      alignItems: 'center',
+      paddingTop: isAndroid ? spacing[1] : spacing[2],
+      paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
+    }}>
+      <NavTab
+        label="홈"
+        icon={<Home size={24} strokeWidth={1.8} />}
+        active={activeKey === 'home'}
+        onClick={() => navigate('/')}
+        height={NAV_HEIGHT}
+        isAndroid={isAndroid}
+      />
+      <NavTab
+        label="결제매장"
+        icon={<Store size={24} strokeWidth={1.8} />}
+        active={activeKey === 'store'}
+        onClick={() => navigate('/store')}
+        height={NAV_HEIGHT}
+        isAndroid={isAndroid}
+      />
+      <NavTab
+        label="이용내역"
+        icon={<Receipt size={24} strokeWidth={1.8} />}
+        active={activeKey === 'history'}
+        onClick={() => navigate('/history')}
+        height={NAV_HEIGHT}
+        isAndroid={isAndroid}
+      />
+      <NavTab
+        label="지원금·혜택"
+        icon={<Gift size={24} strokeWidth={1.8} />}
+        active={activeKey === 'support'}
+        onClick={() => navigate('/support')}
+        height={NAV_HEIGHT}
+        isAndroid={isAndroid}
+      />
+      <NavTab
+        label="MY"
+        icon={<User size={24} strokeWidth={1.8} />}
+        active={activeKey === 'my'}
+        onClick={() => navigate('/my')}
+        height={NAV_HEIGHT}
+        isAndroid={isAndroid}
+      />
+    </div>
+  )
+}
+
+function NavTab({ label, icon, active, onClick, height, isAndroid }) {
+  const sizes = useTypography()
+  const color = active ? colors.primary[700] : colors.gray[400]
+  // iOS HIG: 선택 탭은 채운 아이콘, 비선택은 외곽선으로 구분한다.
+  // 색만으로 구분하면 색각 이상 사용자가 현재 위치를 읽지 못한다 (정적 단서 이중화).
+  const iconEl = !isAndroid && active
+    ? cloneElement(icon, { fill: color, fillOpacity: 0.18 })
+    : icon
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        gap: '4px',
+        minHeight: height,
+        color,
+      }}
+    >
+      <span style={{
+        width: isAndroid ? '56px' : undefined,
+        height: isAndroid ? '32px' : undefined,
+        borderRadius: isAndroid ? md3Shape.full : undefined,
+        backgroundColor: isAndroid && active ? colors.primary[100] : 'transparent',
+        // A-3: 탭 전환은 하루에도 수십 번 반복한다. MD3 Expressive 기본 모션은
+        // 오버슈트가 있지만 시니어에게 과하므로 짧은 감속만 남긴다. iOS는 즉시 전환.
+        transition: isAndroid ? 'background-color 120ms cubic-bezier(0.23,1,0.32,1)' : undefined,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color,
+      }}>{iconEl}</span>
+      <span style={{
+        fontSize: sizes.nav,
+        fontWeight: active ? typography.weight.medium : typography.weight.regular,
+        color,
+        fontFamily: typography.fontFamily,
+        lineHeight: 1.2,
+      }}>
+        {label}
+      </span>
+    </button>
+  )
+}

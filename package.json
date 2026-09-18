@@ -1,0 +1,17 @@
+{
+  "name": "gangnungpay-renewal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "강릉페이 리뉴얼 — React + Express Full-Stack",
+  "scripts": {
+    "dev:client": "npm --prefix client run dev",
+    "dev:server": "npm --prefix server run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build": "npm --prefix client run build",
+    "start": "npm --prefix server run start",
+    "install:all": "npm --prefix client install && npm --prefix server install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

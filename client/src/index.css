@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+body.platform-android,
+body.platform-android * {
+  font-family: 'Noto Sans KR', sans-serif !important;
+}
+
+/* 색·폰트 토큰은 tokens.js가 단일 소스다.
+   Tailwind @theme 블록은 이 프로젝트에서 className을 쓰지 않아 소비자가 없었고,
+   tokens.js와 같은 색을 중복 정의해 리브랜딩 시 누락 위험만 만들었으므로 제거했다. */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', sans-serif;
+  /* 배경색은 App.jsx가 tokens.surface.background로 주입한다 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* 숫자 폭을 고정한다. 잔액이 바뀔 때 자릿수마다 폭이 달라져 숫자가 흔들리는 것을 막는다.
+     font-variant-numeric은 상속되므로 여기서 한 번만 선언하면 모든 금액 표시에 적용된다. */
+  font-variant-numeric: tabular-nums;
+  /* 브라우저 기본 줄간격(약 1.2)은 한글 본문에 좁다. App.jsx가 토큰값을 주입한다 */
+  line-height: var(--app-line-height, 1.5);
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* 스크롤바 숨김 (모바일 앱 느낌) */
+::-webkit-scrollbar {
+  display: none;
+}
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Sprint 1: html5-qrcode 주입 DOM override */
+#qr-reader video {
+  object-fit: cover;
+  border-radius: 8px;
+}
+#qr-reader img,
+#qr-reader br {
+  display: none !important;
+}
+
+* {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+
+/* ─── A-1. 모션 감소 설정 존중 ────────────────────────────────────────────────
+   OS에서 "동작 줄이기"를 켠 사용자에게는 이동·전환을 걷어낸다.
+   색 변화 같은 즉시 피드백은 상태 전달 수단이므로 살려 둔다 (아래 예외 규칙). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* 누름·선택 피드백은 남긴다. 이게 사라지면 눌렸는지 알 수 없다 */
+  button, [role="switch"], [role="tab"] {
+    transition-duration: 80ms !important;
+    transition-property: background-color, border-color, color !important;
+  }
+}
+
+/* ─── C. Liquid Glass ────────────────────────────────────────────────────────
+   값은 전부 tokens.js의 glass 토큰에서 온다. App.jsx가 :root에 주입한다.
+   떠 있는 크롬(탭바·상단바·시트·플로팅바)에만 쓴다. 본문 카드에는 쓰지 않는다. */
+.glass {
+  background: var(--glass-tint-fallback);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1.5px 0 var(--glass-specular-top),
+    inset 0 -1px 0 var(--glass-specular-bottom),
+    0 10px 30px var(--glass-drop-shadow);
+}
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--glass-tint);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  }
+}
+
+/* C-3. 시니어 모드와 투명도 감소 설정에서는 유리를 끄지 않고 "읽을 수 있는 유리"로 낮춘다.
+   블러를 줄이고, 배경을 거의 불투명하게 올리고, 테두리 대비를 높인다. */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  body.senior-mode .glass {
+    background: var(--glass-tint-senior);
+    -webkit-backdrop-filter: blur(var(--glass-blur-senior)) saturate(var(--glass-saturate-senior));
+    backdrop-filter: blur(var(--glass-blur-senior)) saturate(var(--glass-saturate-senior));
+  }
+}
+body.senior-mode .glass {
+  border-color: var(--glass-border-senior);
+  box-shadow:
+    inset 0 1.5px 0 var(--glass-specular-top-senior),
+    0 10px 30px var(--glass-drop-shadow);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: var(--glass-tint-senior) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur-senior)) saturate(var(--glass-saturate-senior)) !important;
+    backdrop-filter: blur(var(--glass-blur-senior)) saturate(var(--glass-saturate-senior)) !important;
+    border-color: var(--glass-border-senior) !important;
+  }
+}
+
+/* 테두리 방향 변형. 탭바는 위쪽만, 상단바는 아래쪽만 선이 필요하다 */
+.glass-top-only { border-left: none; border-right: none; border-bottom: none; }
+.glass-bottom-only { border-left: none; border-right: none; border-top: none; }
+
+/* 모달 딤(scrim). 딤 색은 각 컴포넌트가 인라인으로 주고, 여기서는 뒤 배경만 흐린다.
+   시니어 모드와 투명도 감소에서는 블러를 걷어 딤만 남긴다(가장 읽기 쉬운 상태). */
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-scrim {
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+  }
+  body.senior-mode .glass-scrim {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass-scrim {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}

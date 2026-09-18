@@ -1,0 +1,22 @@
+# ─── Dependencies ───
+node_modules/
+
+# ─── Environment ───
+.env
+.env.local
+.env.*.local
+
+# ─── Build ───
+dist/
+build/
+
+# ─── IDE ───
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# ─── Logs ───
+*.log
+npm-debug.log*
