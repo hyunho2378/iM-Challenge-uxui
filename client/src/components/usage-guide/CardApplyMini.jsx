@@ -35,11 +35,13 @@ function CardSVG() {
     )
 }
 
+// 09차: 이 미니 프리뷰는 CardApplyPage의 축소판이라 혜택 문구가 같은 값을 미러링한다.
+// 본 화면을 전사.md S09 근거(월충전한도 300,000 / 소득공제 30%)로 맞춘 것과 동일하게 수정한다.
 const BENEFITS = [
     { bg: colors.warmBg, dot: colors.store.category.food, mark: 'W', text: <span>결제할 때마다 <b>10%</b><br /><span style={{ fontSize: sizes.xxs, color: colors.gray[500] }}>월 <b>최대 3만원</b> 적립</span></span> },
-    { bg: colors.primary[50], dot: colors.primary[600], mark: '%', text: <span>혜택가맹점 최대 <b>7%</b> 할인</span> },
+    { bg: colors.primary[50], dot: colors.primary[600], mark: '₩', text: <span>월 충전한도 <b>30만원</b></span> },
     { bg: colors.greenBg, dot: colors.teal[500], mark: 'Q', text: <span>지갑없이 <b>QR</b> 코드로 간편 결제</span> },
-    { bg: colors.gray[100], dot: colors.gray[400], mark: '%', text: <span>소득공제 최대 <b>40%</b> 혜택</span> },
+    { bg: colors.gray[100], dot: colors.gray[400], mark: '%', text: <span>소득공제 최대 <b>30%</b> 혜택</span> },
 ]
 
 // props: { step = 'select' }  ('select' | 'shipped')

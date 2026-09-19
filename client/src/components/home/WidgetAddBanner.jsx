@@ -53,13 +53,12 @@ export default function WidgetAddBanner() {
         위젯 추가하기
       </button>
 
-      {/* Glassmorphism 슬라이드 패널 — S1, Nielsen #1 */}
+      {/* 09차 4번: 08차 전역 리퀘드글래스 제거 때 이 패널만 남아 있었다.
+          backdrop-filter·반투몥 배경·흰 테두리를 걷어내고 일반 카드 면으로 맞춘다. */}
       <div
         style={{
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          backgroundColor: 'rgba(255,255,255,0.6)',
-          border: '1px solid rgba(255,255,255,0.8)',
+          backgroundColor: colors.surface.card,
+          border: `1px solid ${colors.gray[200]}`,
           borderRadius: layout.radiusSmall,
           maxHeight: expanded ? '160px' : '0px',
           opacity: expanded ? 1 : 0,

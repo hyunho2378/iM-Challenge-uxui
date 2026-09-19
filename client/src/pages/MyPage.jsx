@@ -14,9 +14,12 @@ import BottomNavBar from '../components/layout/BottomNavBar'
 import MyMenuGroup from '../components/mypage/MyMenuGroup'
 import Button from '../components/common/Button'
 
+// 09차: 목업 신원을 '김초당'/'chodang@example.com'에서 교체한다.
+// '초당'은 강릉 동 이름(초당순두부)으로, 이 프로젝트가 강릉페이 베이스에서 출발한 잔재다.
+// 대구 앱에는 맞지 않아 지역성 없는 이름으로 바꿈.
 const USER_PROFILE = {
-  name: '김초당',
-  email: 'chodang@example.com',
+  name: '김민서',
+  email: 'minseo@example.com',
   phone: '010-0000-0000',
 }
 

@@ -22,8 +22,30 @@ import Button from '../components/common/Button'
 import CoachMarkOverlay from '../components/common/CoachMarkOverlay'
 
 // B1: 140×88 축소 (viewBox 좌표계 220×138 유지)
+// 09차: 카드 아트워크 근거 — 전사.md S05 "색·타이포 관찰"에 "대구로Pay 카드는 빨강 바탕에
+// 노란 캐릭터, 포항사랑카드는 흰 바탕"으로 명시돼 있다. 두 카드를 그대로 구분한다.
 function CardSVG({ type }) {
-  const isTransit = type === 'transit'
+  const isPohang = type === 'pohang'
+
+  if (isPohang) {
+    // 포항사랑카드 — 흰 바탕(S05). 흰 카드라 테두리로 경계를 주고 글자는 진한 색을 쓴다.
+    return (
+      <svg width="120" height="75" viewBox="0 0 220 138" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0.5" y="0.5" width="219" height="137" rx="12" fill={colors.surface.card} stroke={colors.gray[300]} />
+        <path d="M0 104 Q40 78 80 92 Q120 70 160 88 Q190 76 220 84 L220 126 Q220 138 208 138 L12 138 Q0 138 0 126 Z" fill={colors.gray[100]} />
+        <rect x="16" y="48" width="28" height="22" rx="4" fill={colors.illustration.cardChip} />
+        <line x1="22" y1="48" x2="22" y2="70" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
+        <line x1="28" y1="48" x2="28" y2="70" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
+        <line x1="34" y1="48" x2="34" y2="70" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
+        <line x1="16" y1="55" x2="44" y2="55" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
+        <line x1="16" y1="62" x2="44" y2="62" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
+        <text x="16" y="30" fontSize="11" fontWeight="700" fill={colors.gray[900]} fontFamily="sans-serif">포항사랑카드</text>
+        <text x="16" y="122" fontSize="9" fontWeight="600" fill={colors.gray[600]} fontFamily="sans-serif">포항시</text>
+        <text x="16" y="107" fontSize="10" fill={colors.gray[400]} letterSpacing="2" fontFamily="monospace">•••• •••• •••• ••••</text>
+      </svg>
+    )
+  }
+
   return (
     <svg width="120" height="75" viewBox="0 0 220 138" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* 08차 0번: 전사.md S05/S08/S17/S28 4곳에서 확인된 실제 카드 색(빨강)으로 되돌린다.
@@ -45,17 +67,13 @@ function CardSVG({ type }) {
       <line x1="16" y1="62" x2="44" y2="62" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
       <text x="16" y="30" fontSize="11" fontWeight="700" fill="rgba(255,255,255,0.9)" fontFamily="sans-serif">대구로페이</text>
       <text x="16" y="122" fontSize="9" fontWeight="600" fill="rgba(255,255,255,0.7)" fontFamily="sans-serif">대구시</text>
-      {isTransit && (
-        <rect x="170" y="108" width="36" height="18" rx="4" fill="rgba(255,255,255,0.2)" />
-      )}
-      {isTransit && (
-        <text x="174" y="121" fontSize="9" fontWeight="700" fill="rgba(255,255,255,0.9)" fontFamily="sans-serif">eZL</text>
-      )}
       <text x="16" y="107" fontSize="10" fill="rgba(255,255,255,0.6)" letterSpacing="2" fontFamily="monospace">•••• •••• •••• ••••</text>
     </svg>
   )
 }
 
+// 09차: 전사.md S05 — 온보딩 "지역사랑상품권 선택" 화면의 카드 2종은 대구로Pay / 포항사랑카드다.
+// 이전에 두었던 "대구로페이(교통카드 겸용)"과 발급비용 5,000원은 전사.md에 근거가 없어 제거했다.
 const CARD_TYPES = [
   {
     id: 'standard',
@@ -64,10 +82,10 @@ const CARD_TYPES = [
     cost: null,
   },
   {
-    id: 'transit',
-    name: '대구로페이(교통카드 겸용)',
+    id: 'pohang',
+    name: '포항사랑카드',
     badges: [],
-    cost: '발급 비용 5,000원',
+    cost: null,
   },
 ]
 
@@ -90,16 +108,18 @@ function getBenefits(sizes) {
     ),
   },
   {
+    // 09차: 근거 없던 "혜택가맹점 최대 7% 할인"을 제거하고,
+    // 전사.md S09 원형 지표 3개 중 하나인 "월충전한도 300,000"으로 교체한다.
     iconBg: colors.primary[50],
     iconContent: (
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
         <circle cx="10" cy="10" r="10" fill={colors.primary[600]} />
-        <text x="10" y="15" textAnchor="middle" fontSize="11" fontWeight="900" fill={colors.surface.card} fontFamily="sans-serif">%</text>
+        <text x="10" y="14" textAnchor="middle" fontSize="9" fontWeight="900" fill={colors.surface.card} fontFamily="sans-serif">₩</text>
       </svg>
     ),
     text: (
       <span>
-        혜택가맹점 최대 <b>7%</b> 할인
+        월 충전한도 <b>30만원</b>
       </span>
     ),
   },
@@ -134,7 +154,8 @@ function getBenefits(sizes) {
     ),
     text: (
       <span>
-        소득공제 최대 <b>40%</b> 혜택
+        {/* 09차: 전사.md S09 "소득공제혜택 30%" — 40%는 근거 없는 수치였다 */}
+        소득공제 최대 <b>30%</b> 혜택
       </span>
     ),
   },
@@ -490,7 +511,7 @@ export default function CardApplyPage() {
               </button>
 
               <div>
-                <CardSVG type={selectedCard.id === 'transit' ? 'transit' : 'standard'} />
+                <CardSVG type={selectedCard.id} />
               </div>
 
               <button

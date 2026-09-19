@@ -136,7 +136,7 @@ export default function MenuDrawer({ isOpen, onClose }) {
               color: colors.onDark.primary,
             }}
           >
-            김초당
+            김민서
           </p>
           <p
             style={{
@@ -145,7 +145,7 @@ export default function MenuDrawer({ isOpen, onClose }) {
               color: 'rgba(255,255,255,0.75)',
             }}
           >
-            chodang@example.com
+            minseo@example.com
           </p>
         </div>
 

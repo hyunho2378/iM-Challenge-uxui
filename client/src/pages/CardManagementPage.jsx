@@ -50,6 +50,48 @@ function ToggleSwitch({ on, onChange }) {
   )
 }
 
+// 09차: 전사.md S08(카드목록관리) — "카드 리스트(초기: zero pay '제로페이를 사용해보세요' 항목만;
+// 05:41 재방문 시엔 '대구로페이(5960) 0원' 카드가 추가되어 표시)", 색 관찰은 "zero pay는 남색 썸네일".
+// 원문은 대구로페이 카드가 없어도 제로페이가 먼저 보이는 구조라 항상 노출한다.
+// 등록/가입 플로우는 원문에 없어 만들지 않고, 안내 문구+아이콘만 둔다.
+function ZeroPayRow() {
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: spacing[3],
+      padding: `${spacing[3]} ${spacing[4]}`,
+      backgroundColor: colors.surface.card,
+      borderTop: `1px solid ${colors.gray[100]}`,
+      borderBottom: `1px solid ${colors.gray[100]}`,
+      fontFamily: typography.fontFamily,
+    }}>
+      {/* zero pay 남색 썸네일(전사.md S08 색 관찰) */}
+      <svg width="40" height="26" viewBox="0 0 40 26" fill="none" style={{ flexShrink: 0 }} aria-hidden="true">
+        <rect width="40" height="26" rx="4" fill={colors.surface.darkCard} />
+        <text x="20" y="17" textAnchor="middle" fontSize="9" fontWeight="700" fill={colors.onDark.primary} fontFamily="sans-serif">zero</text>
+      </svg>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{
+          margin: 0,
+          fontSize: typography.size.sm,
+          fontWeight: typography.weight.semibold,
+          color: colors.gray[900],
+        }}>
+          제로페이를 사용해보세요
+        </p>
+        <p style={{
+          margin: `2px 0 0 0`,
+          fontSize: typography.size.xs,
+          color: colors.gray[500],
+        }}>
+          대구로페이 카드가 없어도 이용할 수 있어요
+        </p>
+      </div>
+    </div>
+  )
+}
+
 function SectionHeader({ title }) {
   return (
     <div style={{
@@ -292,6 +334,10 @@ export default function CardManagementPage() {
             </button>
           </div>
         </div>
+
+        {/* 함께 쓸 수 있는 결제 수단 — 카드 보유 여부와 무관하게 항상 노출 */}
+        <SectionHeader title="함께 쓸 수 있어요" />
+        <ZeroPayRow />
 
         {/* 충전 */}
         <SectionHeader title="충전" />
