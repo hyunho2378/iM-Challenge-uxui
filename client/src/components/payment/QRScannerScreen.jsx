@@ -16,18 +16,53 @@ import Button from '../common/Button'
 
 const LOW_BALANCE = 10000
 
+// 카메라를 켜지 못한 이유별 안내. 권한 거부와 카메라 없음/사용 중은 사용자가 할 일이 달라 문구를 나눈다
+const CAMERA_NOTICE = {
+  permission_denied: {
+    title: '카메라 접근을 허용해주세요',
+    hint: '설정 → 앱 → 카메라 권한 허용 후\n다시 시도해주세요',
+  },
+  camera_unavailable: {
+    title: '카메라를 사용할 수 없어요',
+    hint: '카메라를 찾지 못했거나 다른 앱이 쓰고 있어요.\n카메라가 있는 기기에서 다시 시도해주세요',
+  },
+}
+
+// html5-qrcode는 실패 이유를 문자열로 돌려준다(예: "... error = NotAllowedError: Permission denied")
+const classifyCameraError = (err) =>
+  /NotAllowed|Permission|denied/i.test(String(err)) ? 'permission_denied' : 'camera_unavailable'
+
+// 카메라 시작과 정지를 한 줄로 세운다. 화면을 빠르게 열고 닫거나 권한 요청이 끝나기 전에 나가도
+// start와 stop이 겹치지 않고, 늦게 켜진 카메라도 곧바로 꺼진다.
+// (html5-qrcode의 stop()은 스캔 중이 아니면 동기 예외를 던지므로 시작이 끝난 뒤에만 부른다)
+let scannerQueue = Promise.resolve()
+const enqueueScanner = (task) => { scannerQueue = scannerQueue.then(task).catch(() => {}) }
+
+// html5-qrcode는 video.play()가 돌려주는 프로미스의 거부를 처리하지 않는다. 카메라가 막 켜지는 순간 화면을 닫아
+// video가 문서에서 빠지면 AbortError가 콘솔에 처리되지 않은 에러로 남는다. 시작하는 동안만 그 거부를 삼킨다.
+const withPlayRejectionGuard = async (start) => {
+  const proto = HTMLMediaElement.prototype
+  const original = proto.play
+  proto.play = function guardedPlay(...args) {
+    const played = original.apply(this, args)
+    if (played?.catch) played.catch(() => {})
+    return played
+  }
+  try { return await start() } finally { proto.play = original }
+}
+
 export default function QRScannerScreen({ onClose, balance = 120000, onCharge, cardCount = 1, onScan }) {
   const navigate = useNavigate()
   const { spendBalance } = useUser()
   const isAndroid = usePlatform() === 'android'
   const [scanPulse, setScanPulse] = useState(true)
-  // 'init' | 'scanning' | 'permission_denied'
+  // 'init' | 'scanning' | 'permission_denied' | 'camera_unavailable'
   const [cameraState, setCameraState] = useState('init')
   const [scannedData, setScannedData] = useState(null)
   const [paymentDone, setPaymentDone] = useState(false)
 
-  const html5QrCodeRef = useRef(null)
   const scannedRef = useRef(false)
+  const payTimerRef = useRef(null)
 
   // Q-03: 스캔 상태 펄스 피드백 (Nielsen #1)
   useEffect(() => {
@@ -35,35 +70,49 @@ export default function QRScannerScreen({ onClose, balance = 120000, onCharge, c
     return () => clearInterval(interval)
   }, [])
 
-  // 카메라 초기화 — Cleanup on unmount
+  // 카메라 초기화. 나갈 때 반드시 정리한다: 시작이 끝나기 전에 나가면(권한 요청 중 포함) 시작을 건너뛰거나,
+  // 시작이 늦게 끝난 경우 곧바로 멈춘다.
   useEffect(() => {
-    const html5QrCode = new Html5Qrcode('qr-reader')
-    html5QrCodeRef.current = html5QrCode
-
-    html5QrCode
-      .start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 260, height: 260 } },
-        (decodedText) => {
-          if (scannedRef.current) return
-          const result = onScan?.(decodedText)
-          if (!result) return  // onScan 없거나 매장 풀 비었음 → 결제 불가
-          scannedRef.current = true
-          setScannedData({
-            amount: result.amount,
-            storeName: result.storeName,
-            raw: decodedText,
-          })
-        },
-        () => {}
-      )
-      .then(() => setCameraState('scanning'))
-      .catch(() => setCameraState('permission_denied'))
+    let disposed = false
+    let started = null  // 카메라를 실제로 켠 스캐너
+    enqueueScanner(async () => {
+      if (disposed) return
+      const scanner = new Html5Qrcode('qr-reader')
+      try {
+        await withPlayRejectionGuard(() => scanner.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 260, height: 260 } },
+          (decodedText) => {
+            if (scannedRef.current) return
+            const result = onScan?.(decodedText)
+            if (!result) return  // onScan 없거나 매장 풀 비었음 → 결제 불가
+            scannedRef.current = true
+            setScannedData({
+              amount: result.amount,
+              storeName: result.storeName,
+              raw: decodedText,
+            })
+          },
+          () => {}
+        ))
+        started = scanner
+        if (!disposed) setCameraState('scanning')
+      } catch (err) {
+        if (!disposed) setCameraState(classifyCameraError(err))
+      }
+    })
 
     return () => {
-      html5QrCode.stop().catch(() => {})
+      disposed = true
+      enqueueScanner(async () => {
+        if (!started) return
+        try { await started.stop() } catch { /* 이미 멈춘 상태 */ }
+      })
     }
   }, [])
+
+  // 결제 완료 화면에서 홈으로 넘어가는 타이머는 화면을 나가면 함께 정리한다
+  useEffect(() => () => clearTimeout(payTimerRef.current), [])
 
   // html5-qrcode video/canvas stretch 방지 — object-fit: cover 강제
   useEffect(() => {
@@ -109,7 +158,8 @@ export default function QRScannerScreen({ onClose, balance = 120000, onCharge, c
     // 잔액/캐시백 차감 + 이용내역 추가 + DB 기록(UserContext.spendBalance → logAction)
     spendBalance(scannedData.amount, scannedData.storeName)
     setPaymentDone(true)
-    setTimeout(() => navigate('/'), 1200)
+    // replace: 결제 후 홈에서 뒤로가기를 눌렀을 때 스캐너(카메라)로 되돌아가지 않게 한다
+    payTimerRef.current = setTimeout(() => navigate('/', { replace: true }), 1200)
   }
 
   const handleCharge = onCharge ?? (() => {})
@@ -179,6 +229,7 @@ export default function QRScannerScreen({ onClose, balance = 120000, onCharge, c
       >
         <button
           onClick={onClose}
+          aria-label="뒤로가기"
           style={{
             background: 'none',
             border: 'none',
@@ -260,8 +311,8 @@ export default function QRScannerScreen({ onClose, balance = 120000, onCharge, c
             </div>
           )}
 
-          {/* Nielsen #9: 카메라 권한 거부 오버레이 — 한국어 평문 */}
-          {cameraState === 'permission_denied' && (
+          {/* Nielsen #9: 카메라를 못 켠 이유 오버레이 — 한국어 평문 */}
+          {CAMERA_NOTICE[cameraState] && (
             <div
               style={{
                 position: 'absolute',
@@ -289,7 +340,7 @@ export default function QRScannerScreen({ onClose, balance = 120000, onCharge, c
                   lineHeight: 1.6,
                 }}
               >
-                카메라 접근을 허용해주세요
+                {CAMERA_NOTICE[cameraState].title}
               </span>
               <span
                 style={{
@@ -299,7 +350,7 @@ export default function QRScannerScreen({ onClose, balance = 120000, onCharge, c
                   lineHeight: 1.5,
                 }}
               >
-                설정 → 앱 → 카메라 권한 허용 후{'\n'}다시 시도해주세요
+                {CAMERA_NOTICE[cameraState].hint}
               </span>
             </div>
           )}
@@ -341,9 +392,7 @@ export default function QRScannerScreen({ onClose, balance = 120000, onCharge, c
             transition: 'opacity 200ms cubic-bezier(0.23,1,0.32,1)',
           }}
         >
-          {cameraState === 'permission_denied'
-            ? '카메라 접근을 허용해주세요'
-            : 'QR 코드를 화면에 맞춰주세요'}
+          {CAMERA_NOTICE[cameraState]?.title ?? 'QR 코드를 화면에 맞춰주세요'}
         </span>
       </div>
 
