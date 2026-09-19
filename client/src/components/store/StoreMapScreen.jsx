@@ -704,7 +704,7 @@ export default function StoreMapScreen() {
         <CoachMarkOverlay
           targetRef={categoryBarRef}
           placement="bottom"
-          message="음식점, 카페, 마트처럼 원하는 업종을 누르면 그 업종의 가맹점만 걸러서 보여줍니다. 한 번 더 누르면 필터가 풀립니다."
+          message="음식점, 카페, 마트처럼 원하는 업종을 누르면 그 업종의 가맹점만 걸러서 보여줍니다. 다시 모두 보려면 맨 앞의 [전체]를 누르세요."
           step={1}
           totalSteps={2}
           onNext={() => setStoreCoachStep(2)}
