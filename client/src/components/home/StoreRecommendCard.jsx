@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
 
+// 09차: 이전 베이스 프로젝트(타 지역)의 상호가 남아 있어 제거하고,
+// 전사.md 캐처에 실제로 등장하는 상호(S34 쿠폰함·S44 목록)로 교체한다.
 const defaultStores = [
-  { id: 1, name: '서문시장', category: '전통시장', distance: '0.3km' },
-  { id: 2, name: '초당순두부마을', category: '음식점', distance: '1.2km' },
-  { id: 3, name: '동성로 카페거리', category: '카페', distance: '0.8km' },
+  { id: 1, name: '오복식당', category: '음식점', distance: '0.3km' },
+  { id: 2, name: '수야커피', category: '카페', distance: '1.2km' },
+  { id: 3, name: '푸름식품', category: '마트', distance: '0.8km' },
 ]
 
 function StoreIcon({ color }) {

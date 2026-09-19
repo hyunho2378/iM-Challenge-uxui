@@ -1,6 +1,7 @@
 import { colors, typography, layout, spacing } from '../../tokens/tokens'
 
-const KEYWORDS = ['대구 맛집', '카페', '편의점', '숙박', 'GS25', '순두부', '테라로사', '경포대']
+// 09차: 이전 베이스 프로젝트(타 지역)의 상호·지명이 인기 검색어에 남아 있어 대구 기준으로 교체했다.
+const KEYWORDS = ['대구 맛집', '카페', '편의점', '국밥', '서문시장', '동성로', '안경', '학원']
 
 export default function PopularKeywords({ onKeywordClick }) {
   return (

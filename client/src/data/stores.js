@@ -7,9 +7,13 @@ import qrStoresData from './qr-stores.json'
 export const STORES = storesData
 export const QR_STORES = qrStoresData
 
+// 09차: '포항사랑가맹점'을 마지막에 얹는다.
+// 근거 — 전사.md S24 SHOP 탭 카테고리 그리드 12개 목록의 마지막 항목이 '포항사랑가맹점'이다.
+// 기존 13개 체계(생활 밀착 소분류)는 그대로 두고 이 항목만 추가한다.
 export const CATEGORIES = [
   '전체', '음식점', '카페', '편의점', '마트', '의료',
   '미용', '교통', '숙박', '관광', '생활', '교육', '기타',
+  '포항사랑가맹점',
 ]
 
 export function searchStores(query, options = {}) {

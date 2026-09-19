@@ -11,7 +11,7 @@ const mockNotifications = [
       {
         id: 1,
         title: '캐시백 적립',
-        content: '초당순두부에서 320원 캐시백 적립',
+        content: '오복식당에서 320원 캐시백 적립',
         time: '14:23',
         isRead: false,
         type: 'cashback',

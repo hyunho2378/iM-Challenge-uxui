@@ -6,10 +6,12 @@ import { colors, typography, layout, spacing } from '../../tokens/tokens'
 import { QR_STORES } from '../../data/stores'
 import StoreListItem from './StoreListItem'
 
+// 09차: 이전 베이스 프로젝트의 타 지역 상호·지명이 남아 있어 전부 교체했다.
+// 전사.md 캐처 상호 + 대구 지명으로 교체한다.
 const FREQUENT = [
-  { id: 1, name: '초당순두부', category: '음식점', address: '금성로' },
-  { id: 2, name: '테라로사', category: '카페', address: '구정면' },
-  { id: 3, name: 'GS25 경포점', category: '편의점', address: '경포로' },
+  { id: 1, name: '오복식당', category: '음식점', address: '태평로' },
+  { id: 2, name: '수야커피', category: '카페', address: '침산로' },
+  { id: 3, name: '푸름식품', category: '마트', address: '달성로' },
 ]
 
 export default function FrequentPlaces({ onSelectStore }) {

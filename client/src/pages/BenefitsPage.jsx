@@ -8,7 +8,7 @@
  */
 
 import { useNavigate } from 'react-router-dom'
-import { CheckCircle, FileCheck } from 'lucide-react'
+import { CheckCircle, FileCheck, Ticket, ChevronRight, Fuel, Wallet } from 'lucide-react'
 import { useUser, MONTHLY_DISCOUNT_LIMIT } from '../context/UserContext'
 import { colors, typography, layout, spacing, shadow } from '../tokens/tokens'
 import { useTypography } from '../hooks/useTypography'
@@ -69,6 +69,22 @@ export default function BenefitsPage() {
           <Button variant="filled" size="lg" onClick={() => navigate('/card-apply')} style={{ maxWidth: '280px' }}>
             카드 신청하기
           </Button>
+          {/* 쿠폰함은 카드가 없어도 볼 수 있다 — 카드 미보유 상태에서도 진입구를 남긴다 */}
+          <button
+            onClick={() => navigate('/coupon')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: colors.primary[700],
+              fontSize: sizes.sm,
+              fontWeight: typography.weight.semibold,
+              cursor: 'pointer',
+              fontFamily: typography.fontFamily,
+              minHeight: layout.touchMin,
+            }}
+          >
+            쿠폰함 보러 가기
+          </button>
         </div>
         <BottomNavBar />
       </ScreenContainer>
@@ -80,6 +96,93 @@ export default function BenefitsPage() {
       <TopAppBarBack title="혜택 현황" onBack={() => navigate(-1)} />
 
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', backgroundColor: colors.surface.background, padding: layout.margin }}>
+        {/* 09차 4번: 쿠폰함 진입—전사.md S34 쿠폰함은 8장이나 캐처된 주요 화면인데
+            지금까지 어느 화면에서도 들어갈 수 없었다. 새 바텐내비 탭 없이 여기서 연결한다. */}
+        <button
+          onClick={() => navigate('/coupon')}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: spacing[3],
+            backgroundColor: colors.surface.card,
+            borderRadius: layout.radiusCard,
+            boxShadow: shadow.card,
+            border: 'none',
+            padding: spacing[5],
+            marginBottom: spacing[4],
+            cursor: 'pointer',
+            fontFamily: typography.fontFamily,
+            textAlign: 'left',
+            minHeight: layout.touchMin,
+          }}
+        >
+          <div style={{
+            width: 40, height: 40, borderRadius: layout.radiusPill,
+            backgroundColor: colors.primary[50],
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          }}>
+            <Ticket size={22} color={colors.primary[700]} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ margin: 0, fontSize: sizes.md, fontWeight: typography.weight.bold, color: colors.gray[900] }}>
+              쿠폰함
+            </p>
+            <p style={{ margin: `${spacing[1]} 0 0`, fontSize: sizes.xs, color: colors.gray[500], lineHeight: typography.lineHeight.body }}>
+              내 주변 가맹점 할인쿠폰을 받아보세요
+            </p>
+          </div>
+          <ChevronRight size={20} color={colors.gray[400]} />
+        </button>
+
+        {/* 09차 5번: 탭 이름이 "지원금·혜택"인데 지원금 내용이 하나도 없었다.
+            전사.md S30 고객센터 FAQ 카테고리 칩에 "고유가지원금", "소비쿠폰지원금"이 실제로 있어
+            그 두 항목을 안내 카드로만 둘다. 실제 신청 플로우는 만들지 않았다. */}
+        <p style={{ margin: `0 0 ${spacing[3]}`, fontSize: sizes.md, fontWeight: typography.weight.semibold, color: colors.gray[900] }}>
+          지원금 안내
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing[3], marginBottom: spacing[5] }}>
+          {[
+            {
+              icon: <Fuel size={20} color={colors.warning} />,
+              bg: colors.warmBg,
+              title: '고유가 지원금',
+              desc: '대구로페이로 지급되는 지원금입니다. 지급 대상·시기는 고객센터에서 확인하세요.',
+            },
+            {
+              icon: <Wallet size={20} color={colors.teal[500]} />,
+              bg: colors.greenBg,
+              title: '소비쿠폰 지원금',
+              desc: '행정복지센터에서 신청한 소비쿠폰도 이 카드로 충전·사용할 수 있어요.',
+            },
+          ].map((it) => (
+            <div key={it.title} style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: spacing[3],
+              backgroundColor: colors.surface.card,
+              borderRadius: layout.radiusCard,
+              boxShadow: shadow.card,
+              padding: spacing[4],
+            }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: layout.radiusPill, backgroundColor: it.bg,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                {it.icon}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: sizes.sm, fontWeight: typography.weight.semibold, color: colors.gray[900] }}>
+                  {it.title}
+                </p>
+                <p style={{ margin: `${spacing[1]} 0 0`, fontSize: sizes.xs, color: colors.gray[500], lineHeight: typography.lineHeight.body }}>
+                  {it.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* 소득공제 신청 여부 */}
         <div style={{
           backgroundColor: colors.surface.card,

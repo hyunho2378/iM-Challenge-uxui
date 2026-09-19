@@ -8,13 +8,15 @@ import PopularKeywords from '../components/search/PopularKeywords'
 import { colors, typography, layout, spacing } from '../tokens/tokens'
 import { usePlatform } from '../hooks/usePlatform'
 
+// 09차: 이전 베이스 프로젝트의 타 지역 상호·지명이 목업에 남아 있어 전부 교체했다.
+// 전사.md 캡처에 실제 등장하는 상호로 바꾸고 대구 장소만 남긴다.
 const MOCK_STORES = [
-  { id: 1, name: '초당순두부', category: '음식점', distance: '0.3km' },
+  { id: 1, name: '오복식당', category: '음식점', distance: '0.3km' },
   { id: 2, name: '서문시장', category: '마트', distance: '1.1km' },
-  { id: 3, name: '보헤미안커피', category: '카페', distance: '0.8km' },
-  { id: 4, name: '테라로사 대구 본점', category: '카페', distance: '0.4km' },
-  { id: 5, name: 'GS25 동성로점', category: '편의점', distance: '0.5km' },
-  { id: 6, name: '경포해변 쏠비치', category: '숙박', distance: '1.2km' },
+  { id: 3, name: '수야커피', category: '카페', distance: '0.8km' },
+  { id: 4, name: '용길이네 국밥집 본점', category: '음식점', distance: '0.4km' },
+  { id: 5, name: '푸름식품', category: '마트', distance: '0.5km' },
+  { id: 6, name: '으뜸플러스안경 대구성서점', category: '생활', distance: '1.2km' },
   { id: 7, name: '대구관광안내소', category: '관광', distance: '0.7km' },
 ]
 
