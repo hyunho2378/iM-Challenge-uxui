@@ -7,16 +7,18 @@
  */
 
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { ArrowLeft } from 'lucide-react'
 import { useUser } from '../context/UserContext'
 import { useApp } from '../context/AppContext'
+import { useOnboarding } from '../context/OnboardingContext'
 import { colors, typography, layout, spacing, shadow } from '../tokens/tokens'
 import { useTypography } from '../hooks/useTypography'
 import ScreenContainer from '../components/layout/ScreenContainer'
 import BottomNavBar from '../components/layout/BottomNavBar'
 import NumPad from '../components/payment/NumPad'
 import PaymentAuthOverlay from '../components/common/PaymentAuthOverlay'
+import CoachMarkOverlay from '../components/common/CoachMarkOverlay'
 import Button from '../components/common/Button'
 
 // FAQ Q19 원문 그대로. 지자체 정책자금 제외는 이 앱 데이터 모델에 별도 항목이 없어
@@ -32,6 +34,8 @@ export default function RefundPage() {
   const sizes = useTypography()
   const { balance, refundBalance } = useUser()
   const { isLargeText, showSnackbar } = useApp()
+  const { hasSeenRefundPageCoach, markSeen } = useOnboarding()
+  const refundAreaRef = useRef(null)
   const [amount, setAmount] = useState(0)
   const [confirming, setConfirming] = useState(false)
   const [showAuth, setShowAuth] = useState(false)
@@ -141,55 +145,57 @@ export default function RefundPage() {
           </div>
         ) : (
           <>
-            {/* 환불 가능 금액 — 조건 충족 여부를 바로 보여준다 */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: `${spacing[4]} ${layout.margin}`,
-              backgroundColor: colors.surface.card,
-              borderRadius: layout.radiusCard,
-              marginBottom: spacing[2],
-            }}>
-              <span style={{ fontSize: sizes.sm, color: colors.gray[700] }}>환불 가능 금액 (잔액의 40%)</span>
-              <span style={{ fontSize: sizes.md, fontWeight: typography.weight.bold, color: colors.primary[700] }}>
-                최대 {fmt(maxRefundable)}
-              </span>
-            </div>
-
-            {/* 금액 표시 */}
-            <div style={{ backgroundColor: colors.surface.card, padding: `${spacing[4]} ${layout.margin}`, textAlign: 'center', borderRadius: layout.radiusCard, marginBottom: spacing[2] }}>
-              <p style={{
-                margin: 0,
-                fontSize: sizes.balanceLarge,
-                fontWeight: typography.weight.bold,
-                color: hasAmount ? colors.gray[900] : colors.gray[400],
+            <div ref={refundAreaRef}>
+              {/* 환불 가능 금액 — 조건 충족 여부를 바로 보여준다 */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: `${spacing[4]} ${layout.margin}`,
+                backgroundColor: colors.surface.card,
+                borderRadius: layout.radiusCard,
+                marginBottom: spacing[2],
               }}>
-                {hasAmount ? fmt(amount) : '0원'}
-              </p>
-              {isOverLimit && (
-                <p style={{ margin: `${spacing[2]} 0 0`, fontSize: sizes.xs, color: colors.error }}>
-                  환불 가능 금액을 넘었어요
-                </p>
-              )}
-            </div>
+                <span style={{ fontSize: sizes.sm, color: colors.gray[700] }}>환불 가능 금액 (잔액의 40%)</span>
+                <span style={{ fontSize: sizes.md, fontWeight: typography.weight.bold, color: colors.primary[700] }}>
+                  최대 {fmt(maxRefundable)}
+                </span>
+              </div>
 
-            <div style={{ padding: `${spacing[2]} 0 ${spacing[3]}` }}>
-              <button
-                onClick={() => setAmount(maxRefundable)}
-                style={{
-                  width: '100%',
-                  minHeight: layout.touchMin,
-                  background: 'none',
-                  border: `1px solid ${colors.gray[200]}`,
-                  borderRadius: layout.radiusButton,
-                  color: colors.gray[700],
-                  fontSize: sizes.sm,
-                  cursor: 'pointer',
-                }}
-              >
-                환불 가능 전액 신청 ({fmt(maxRefundable)})
-              </button>
+              {/* 금액 표시 */}
+              <div style={{ backgroundColor: colors.surface.card, padding: `${spacing[4]} ${layout.margin}`, textAlign: 'center', borderRadius: layout.radiusCard, marginBottom: spacing[2] }}>
+                <p style={{
+                  margin: 0,
+                  fontSize: sizes.balanceLarge,
+                  fontWeight: typography.weight.bold,
+                  color: hasAmount ? colors.gray[900] : colors.gray[400],
+                }}>
+                  {hasAmount ? fmt(amount) : '0원'}
+                </p>
+                {isOverLimit && (
+                  <p style={{ margin: `${spacing[2]} 0 0`, fontSize: sizes.xs, color: colors.error }}>
+                    환불 가능 금액을 넘었어요
+                  </p>
+                )}
+              </div>
+
+              <div style={{ padding: `${spacing[2]} 0 ${spacing[3]}` }}>
+                <button
+                  onClick={() => setAmount(maxRefundable)}
+                  style={{
+                    width: '100%',
+                    minHeight: layout.touchMin,
+                    background: 'none',
+                    border: `1px solid ${colors.gray[200]}`,
+                    borderRadius: layout.radiusButton,
+                    color: colors.gray[700],
+                    fontSize: sizes.sm,
+                    cursor: 'pointer',
+                  }}
+                >
+                  환불 가능 전액 신청 ({fmt(maxRefundable)})
+                </button>
+              </div>
             </div>
 
             <NumPad onPress={handleNumPress} />
@@ -304,6 +310,18 @@ export default function RefundPage() {
         }}
         onCancel={() => setShowAuth(false)}
       />
+
+      {/* 신규 화면 첫 방문 안내: 환불 가능 금액이 자동 계산돼 나온다는 것과 전액 신청 버튼을 짚어준다 */}
+      {!hasSeenRefundPageCoach && balance > 0 && (
+        <CoachMarkOverlay
+          targetRef={refundAreaRef}
+          message="환불 가능 금액은 자동으로 계산해서 보여드려요. 전액을 환불하려면 전액 신청을 눌러주세요."
+          step={1}
+          totalSteps={1}
+          onNext={() => markSeen('refundPage')}
+          onSkip={() => markSeen('refundPage')}
+        />
+      )}
     </ScreenContainer>
   )
 }

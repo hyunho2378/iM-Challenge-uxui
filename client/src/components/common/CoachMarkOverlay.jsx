@@ -30,9 +30,15 @@ export default function CoachMarkOverlay({ targetRef, message, step, totalSteps,
     }
 
     updateRects()
+    // 화면이 처음 그려질 때 함께 마운트되면, 데스크톱 프레임의 상태바가 그 직후에 끼어들어 대상이 아래로 밀린다.
+    // 레이아웃이 자리 잡은 뒤(두 프레임 뒤) 한 번 더 잰다.
+    let raf2
+    const raf1 = requestAnimationFrame(() => { raf2 = requestAnimationFrame(updateRects) })
     window.addEventListener('resize', updateRects)
 
     return () => {
+      cancelAnimationFrame(raf1)
+      cancelAnimationFrame(raf2)
       window.removeEventListener('resize', updateRects)
     }
   }, [targetRef])

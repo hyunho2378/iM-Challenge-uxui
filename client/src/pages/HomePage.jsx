@@ -99,6 +99,34 @@ export default function HomePage() {
         {/* H-01: 위젯 추가 배너 */}
         <WidgetAddBanner />
 
+        {/* 프로모션 배너: iM뱅크 자체 상품, 전사.md S07 배너 원문 그대로.
+            이동할 이벤트 상세(S29) 화면이 없어서 눌러도 반응하지 않는 카드로 둔다 */}
+        <div style={{
+          margin: `0 ${layout.margin} ${spacing[3]}`,
+          padding: spacing[5],
+          borderRadius: layout.radiusCard,
+          backgroundColor: colors.primary[100],
+          fontFamily: typography.fontFamily,
+        }}>
+          <p style={{
+            margin: 0,
+            fontSize: typography.size.sm,
+            fontWeight: typography.weight.semibold,
+            color: colors.primary[700],
+          }}>
+            iM뱅크 | 현대카드M
+          </p>
+          <p style={{
+            margin: `${spacing[2]} 0 0`,
+            fontSize: typography.size.lg,
+            fontWeight: typography.weight.bold,
+            color: colors.primary[800],
+            lineHeight: 1.35,
+          }}>
+            최대 5% M포인트 적립<br />7만원 캐시백
+          </p>
+        </div>
+
         {/* 결제 가능 매장 */}
         <SectionHeader
           title="결제 가능 매장"

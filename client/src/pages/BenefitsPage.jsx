@@ -14,6 +14,7 @@ import { colors, typography, layout, spacing, shadow } from '../tokens/tokens'
 import { useTypography } from '../hooks/useTypography'
 import ScreenContainer from '../components/layout/ScreenContainer'
 import TopAppBarBack from '../components/layout/TopAppBarBack'
+import BottomNavBar from '../components/layout/BottomNavBar'
 import Button from '../components/common/Button'
 
 function getMonthKey(date) {
@@ -69,6 +70,7 @@ export default function BenefitsPage() {
             카드 신청하기
           </Button>
         </div>
+        <BottomNavBar />
       </ScreenContainer>
     )
   }
@@ -142,8 +144,10 @@ export default function BenefitsPage() {
           </div>
         )}
 
-        <div style={{ height: spacing[8] }} />
+        <div style={{ height: layout.bottomNavHeight }} />
       </div>
+
+      <BottomNavBar />
     </ScreenContainer>
   )
 }

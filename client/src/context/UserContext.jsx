@@ -1,7 +1,8 @@
 /**
  * UserContext — 캐시백 시스템 + 카드 등록 분기
  * 카드 등록 시점에 generateMockData()로 1년치 가상 거래 주입
- * Session-scoped — 새로고침 시 리셋 (localStorage 금지 정책)
+ * 카드 신청/등록 진행 상태만 sessionStorage에 남긴다(새로고침해도 유지, 탭을 닫으면 사라짐).
+ * 나머지는 세션 메모리라 새로고침 시 리셋된다 (localStorage 금지 정책)
  */
 
 import { createContext, useContext, useReducer, useState, useCallback } from 'react'
@@ -14,6 +15,17 @@ const UserContext = createContext(null)
 // 06차: iM샵 실측(전사.md S09) — 월충전한도 300,000원. 이 한도를 넘겨 충전하려 하면
 // ChargeScreen이 AI 개입(할인없이충전 유도)을 띄운다. 할인없이충전(무혜택)은 이 한도를 소비하지 않는다.
 export const MONTHLY_DISCOUNT_LIMIT = 300000
+
+// 카드 신청/등록 진행 상태('applying' | 'shipped' | 'registered')를 sessionStorage에 남긴다.
+// 기록이 없으면 앱 최초 진입이라 카드 없음('none')으로 시작해, 카드 신청 온보딩을 처음부터 볼 수 있다.
+const CARD_STATUS_KEY = 'gnp_card_status'
+
+function readCardStatus() {
+  try {
+    const v = sessionStorage.getItem(CARD_STATUS_KEY)
+    return v === 'applying' || v === 'shipped' || v === 'registered' ? v : 'none'
+  } catch { return 'none' }
+}
 
 // ─── 초기 상태 (카드 등록 전 = 빈 값) ─────────────────────────────────────────
 
@@ -152,16 +164,16 @@ function userReducer(state, action) {
 
 export function UserProvider({ children }) {
   const { sessionId } = useApp()
-  // 08차 3번: 새로고침마다 카드 보유/미보유가 오락가락한다는 지적 — 정확히는 항상 미보유로
-  // 시작했을 뿐이지만, 데모 중 매번 카드신청 플로우를 다시 타지 않도록 처음부터 카드 보유 +
-  // 목데이터가 로드된 상태로 고정한다. registerCard()와 같은 데이터를 쓴다.
-  const [hasCard, setHasCard] = useState(true)
-  const [cardStatus, setCardStatus] = useState('registered')
+  // 최초 진입은 카드 없음, 카드를 등록한 뒤에는 새로고침해도 카드 보유 상태를 유지한다.
+  // 카드 보유 상태로 시작할 때만 목데이터를 만든다(잔액·이용내역은 새로고침 때 다시 만들어진다).
+  const [cardStatus, setCardStatus] = useState(readCardStatus)
+  const hasCard = cardStatus === 'registered'
   // 05차: 연결계좌 등록 상태 (PAY-01/PAY-03). 은행명 문자열 또는 미등록 시 null
   const [linkedBank, setLinkedBank] = useState(null)
   // 'charge' | 'payment' | 'refund' | null. 서버 기록에 실패한 마지막 동작
   const [lastError, setLastError] = useState(null)
   const [state, dispatch] = useReducer(userReducer, undefined, () => {
+    if (!hasCard) return EMPTY_INITIAL
     const mockData = generateMockData()
     return {
       ...EMPTY_INITIAL,
@@ -173,9 +185,19 @@ export function UserProvider({ children }) {
     }
   })
 
-  const applyCard = useCallback(() => setCardStatus('applying'), [])
-  const shipCard = useCallback(() => setCardStatus('shipped'), [])
+  const updateCardStatus = useCallback((next) => {
+    try { sessionStorage.setItem(CARD_STATUS_KEY, next) } catch { /* ignore */ }
+    setCardStatus(next)
+  }, [])
+  const applyCard = useCallback(() => updateCardStatus('applying'), [updateCardStatus])
+  const shipCard = useCallback(() => updateCardStatus('shipped'), [updateCardStatus])
   const linkAccount = useCallback((bankName) => setLinkedBank(bankName), [])
+
+  // 시연용: 카드 상태 기록을 지우고 앱을 처음부터 다시 연다. 코치마크·연결계좌 같은 메모리 상태도 함께 초기화된다.
+  const resetDemo = useCallback(() => {
+    try { sessionStorage.removeItem(CARD_STATUS_KEY) } catch { /* ignore */ }
+    window.location.assign('/')
+  }, [])
 
   // 카드 등록 시점에 가상 거래 데이터 주입
   const registerCard = useCallback(() => {
@@ -190,9 +212,8 @@ export function UserProvider({ children }) {
         transactions: mockData.transactions,
       },
     })
-    setHasCard(true)
-    setCardStatus('registered')
-  }, [])
+    updateCardStatus('registered')
+  }, [updateCardStatus])
 
   // discounted=true: 정상 충전(/charge, 월한도 300,000 소비). false: 할인없이충전(/charge-free, 한도 미소비)
   const chargeBalance = useCallback((amount, { discounted = true } = {}) => {
@@ -245,6 +266,7 @@ export function UserProvider({ children }) {
       applyCard,
       shipCard,
       registerCard,
+      resetDemo,
       linkedBank,
       linkAccount,
       chargeBalance,

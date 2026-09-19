@@ -18,6 +18,7 @@ export function OnboardingProvider({ children }) {
   const [hasSeenChargeFlowCoach, setHasSeenChargeFlowCoach] = useState(false)
   const [hasSeenAccountLinkCoach, setHasSeenAccountLinkCoach] = useState(false)
   const [hasSeenChargeFreeCoach, setHasSeenChargeFreeCoach] = useState(false)
+  const [hasSeenRefundPageCoach, setHasSeenRefundPageCoach] = useState(false)
 
   const markSeen = useCallback((key) => {
     if (key === 'cardApply') setHasSeenCardApplyCoach(true)
@@ -28,6 +29,7 @@ export function OnboardingProvider({ children }) {
     else if (key === 'chargeFlow') setHasSeenChargeFlowCoach(true)
     else if (key === 'accountLink') setHasSeenAccountLinkCoach(true)
     else if (key === 'chargeFree') setHasSeenChargeFreeCoach(true)
+    else if (key === 'refundPage') setHasSeenRefundPageCoach(true)
   }, [])
 
   const completeAllCoachmarks = useCallback(() => {
@@ -40,6 +42,7 @@ export function OnboardingProvider({ children }) {
     <OnboardingContext.Provider value={{
       hasSeenCardApplyCoach, hasSeenChargeCoach, hasSeenRefundCoach, hasSeenCashbackModal,
       hasSeenCardApplyFlowCoach, hasSeenChargeFlowCoach, hasSeenAccountLinkCoach, hasSeenChargeFreeCoach,
+      hasSeenRefundPageCoach,
       markSeen, completeAllCoachmarks,
     }}>
       {children}
