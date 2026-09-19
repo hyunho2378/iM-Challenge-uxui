@@ -21,14 +21,40 @@ import CashbackEntryCard from '../components/home/CashbackEntryCard'
 import SectionHeader from '../components/home/SectionHeader'
 import StoreRecommendCard from '../components/home/StoreRecommendCard'
 
-const FEATURED_IDS = [9000001, 9000011, 9000021]
-const featuredStores = FEATURED_IDS
-  .map((id) => STORES.find((s) => s.id === id))
-  .filter(Boolean)
-  .map((s) => {
-    const km = calculateDistance(DAEGU_STATION.lat, DAEGU_STATION.lng, s.lat, s.lng)
-    return { ...s, distance: km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km` }
-  })
+// 09차 3번: 이전에는 FEATURED_IDS = [9000001, 9000011, 9000021] 세 개를 박아두어
+// 홈의 '결제 가능 매장'이 항상 동성김밥/동성마트24/동성약국만 반복했다.
+// 이제 대구역 기준 거리순으로 뽑되, 같은 카테고리가 연속해 차지하지 않게
+// 카테고리별로 먼저 한 곳씩 집고 나머지를 거리순으로 채운다(최대 10곳).
+const FEATURED_LIMIT = 10
+const featuredStores = (() => {
+  const withDistance = STORES
+    .filter((s) => s.isQR && typeof s.lat === 'number' && typeof s.lng === 'number')
+    .map((s) => ({ ...s, km: calculateDistance(DAEGU_STATION.lat, DAEGU_STATION.lng, s.lat, s.lng) }))
+    .sort((a, b) => a.km - b.km)
+
+  const picked = []
+  const usedCategories = new Set()
+  // 1패스: 카테고리당 가장 가까운 매장 한 곳씩
+  for (const s of withDistance) {
+    if (picked.length >= FEATURED_LIMIT) break
+    if (usedCategories.has(s.category)) continue
+    usedCategories.add(s.category)
+    picked.push(s)
+  }
+  // 2패스: 자리가 남으면 거리순으로 보충
+  for (const s of withDistance) {
+    if (picked.length >= FEATURED_LIMIT) break
+    if (picked.some((p) => p.id === s.id)) continue
+    picked.push(s)
+  }
+
+  return picked
+    .sort((a, b) => a.km - b.km)
+    .map(({ km, ...s }) => ({
+      ...s,
+      distance: km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`,
+    }))
+})()
 
 export default function HomePage() {
   const navigate = useNavigate()
