@@ -48,7 +48,7 @@ export default function PeriodPickerModal({ open, onClose, onSelect, selectedYea
       {/* 전체화면 dim */}
       <div
         onClick={handleClose}
-        className="glass-scrim"
+       
         style={{
           position: 'fixed',
           inset: 0,

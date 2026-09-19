@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { colors, typography, layout, spacing } from '../../tokens/tokens'
+import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
 
 function QRIcon() {
   return (
@@ -23,8 +23,8 @@ export default function QRFloatingBar() {
 
   return (
     <div
-      className="glass glass-top-only"
       style={{
+      // 08차 4번: 리퀴드글래스 제거 — 단색 배경 + 그림자로 대체
       position: 'fixed',
       bottom: layout.bottomNavHeight,
       left: '50%',
@@ -32,6 +32,8 @@ export default function QRFloatingBar() {
       width: '100%',
       maxWidth: '390px',
       height: layout.qrBarHeight,
+      backgroundColor: colors.surface.card,
+      boxShadow: shadow.card,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',

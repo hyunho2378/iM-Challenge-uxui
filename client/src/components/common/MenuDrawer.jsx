@@ -54,7 +54,7 @@ export default function MenuDrawer({ isOpen, onClose }) {
       {isOpen && (
         <div
           onClick={onClose}
-          className="glass-scrim"
+         
           style={{
             position: 'fixed',
             inset: 0,

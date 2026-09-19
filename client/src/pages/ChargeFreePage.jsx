@@ -32,7 +32,7 @@ function EntryConfirmModal({ onCancel, onContinue }) {
   const sizes = useTypography()
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div onClick={onCancel} className="glass-scrim" style={{ position: 'absolute', inset: 0, backgroundColor: colors.surface.overlay }} />
+      <div onClick={onCancel} style={{ position: 'absolute', inset: 0, backgroundColor: colors.surface.overlay }} />
       <div style={{
         position: 'relative',
         width: 'calc(100% - 64px)',

@@ -8,7 +8,7 @@ export default function AnnouncementModal({ isOpen = true, onDismiss, onClose })
 
   return (
     <div
-      className="glass-scrim"
+     
       style={{
         position: 'fixed',
         inset: 0,

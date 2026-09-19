@@ -34,12 +34,6 @@ export function AppProvider({ children }) {
       })
   }, [])
 
-  // 큰글씨 모드에서는 body에 표식을 단다.
-  // index.css가 이 클래스를 보고 유리를 시니어가 읽을 수 있는 강도로 낮춘다.
-  useEffect(() => {
-    document.body.classList.toggle('senior-mode', isLargeText)
-  }, [isLargeText])
-
   return (
     <AppContext.Provider value={{
       isLargeText,

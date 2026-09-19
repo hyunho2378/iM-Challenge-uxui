@@ -18,12 +18,14 @@ export default function TopAppBarBack({ title, onBack, rightAction }) {
 
   return (
     <div
-      className="glass glass-bottom-only"
       style={{
+      // 08차 4번: 리퀴드글래스 제거 — 단색 배경 + 아래쪽 경계선으로 대체
       position: 'sticky',
       top: 0,
       zIndex: 100,
       height: layout.topBarHeight,
+      backgroundColor: colors.surface.card,
+      borderBottom: `1px solid ${colors.gray[100]}`,
       display: 'flex',
       alignItems: 'center',
       paddingLeft: '4px',

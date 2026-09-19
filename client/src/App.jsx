@@ -5,7 +5,7 @@ import { AppProvider } from './context/AppContext'
 import { OnboardingProvider } from './context/OnboardingContext'
 import { UserProvider } from './context/UserContext'
 import ScreenContainer from './components/layout/ScreenContainer'
-import { colors, glass, typography } from './tokens/tokens'
+import { colors, typography } from './tokens/tokens'
 import SplashPage from './pages/SplashPage'
 import AuthGateScreen from './components/auth/AuthGateScreen'
 import HomePage from './pages/HomePage'
@@ -33,19 +33,30 @@ import BenefitsPage from './pages/BenefitsPage'
 import Snackbar from './components/common/Snackbar'
 import TermsPage from './pages/TermsPage'
 
+// 08차 2번: 딥링크/새로고침마다 게이트가 다시 뜨는 게 "안 넘어간다"는 인상을 줬다.
+// sessionStorage는 프로젝트 규칙상 허용 대상이라 탭을 유지하는 동안은 한 번 통과하면 다시 묻지 않는다.
+function readGatePassed() {
+  try { return sessionStorage.getItem('gnp_gate_passed') === '1' } catch (e) { return false }
+}
+
 function App() {
   const [showSplash, setShowSplash] = useState(true)
   // 07차 2번: 스플래시-홈 사이 최소 본인인증 게이트. 라우터 밖에서 렌더해 딥링크/뒤로가기에 영향 없다.
-  const [gatePassed, setGatePassed] = useState(false)
+  const [gatePassed, setGatePassed] = useState(readGatePassed)
+
+  const passGate = () => {
+    try { sessionStorage.setItem('gnp_gate_passed', '1') } catch (e) { /* ignore */ }
+    setGatePassed(true)
+  }
 
   useEffect(() => {
     applyPlatformClass()
     // 색 단일 소스 유지: CSS는 토큰을 읽을 수 없으므로 body 배경을 여기서 주입한다
-    document.body.style.backgroundColor = colors.surface.background
-    // 유리 토큰과 본문 줄간격을 :root에 주입한다. index.css의 .glass 규칙이 이 변수만 참조한다
-    const root = document.documentElement
-    Object.entries(glass).forEach(([name, value]) => root.style.setProperty(name, value))
-    root.style.setProperty('--app-line-height', String(typography.lineHeight.body))
+    // 08차 8번: 폰 프레임 바깥(데스크탑 시연) 배경을 검정으로. surface.background(#F2F4F8)는
+    // 화면 내부 콘텐츠 배경으로 계속 쓰이므로 토큰 자체는 건드리지 않는다.
+    document.body.style.backgroundColor = colors.gray[900]
+    // 08차 4번: 리퀴드글래스 제거로 유리 토큰 주입도 함께 뺐다. 줄간격 변수만 남는다
+    document.documentElement.style.setProperty('--app-line-height', String(typography.lineHeight.body))
   }, [])
 
   useEffect(() => {
@@ -55,7 +66,8 @@ function App() {
 
   if (showSplash) {
     return (
-      <ScreenContainer statusBarBg={colors.primary[700]} statusBarLight>
+      // 08차 6번: 스플래시 배경을 흰색으로 되돌리면서 상태바도 밝은 배경/어두운 아이콘으로 맞춘다
+      <ScreenContainer statusBarBg={colors.surface.card}>
         <SplashPage />
       </ScreenContainer>
     )
@@ -69,7 +81,7 @@ function App() {
       <OnboardingProvider>
       {!gatePassed ? (
         <ScreenContainer statusBarBg={colors.surface.card}>
-          <AuthGateScreen onDone={() => setGatePassed(true)} onSkip={() => setGatePassed(true)} />
+          <AuthGateScreen onDone={passGate} onSkip={passGate} />
         </ScreenContainer>
       ) : (
       <BrowserRouter>

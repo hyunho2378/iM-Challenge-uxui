@@ -78,8 +78,6 @@ export default function HomePage() {
           minHeight: 0,
           overflowY: 'auto',
           backgroundColor: colors.surface.background,
-          // 04차: TopAppBar가 fixed로 바뀌어 레이아웃에서 빠졌으므로 그만큼 상단 여백을 준다
-          paddingTop: layout.topBarHeight,
         }}
       >
         {/* 04차 4번: 핵심 태스크(잔액/충전)를 프로모션보다 위로. iM샵 원본도 이 순서가 문제였다 */}

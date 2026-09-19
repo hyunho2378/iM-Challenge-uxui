@@ -200,7 +200,9 @@ export default function RefundPage() {
       {balance > 0 && (
         <div style={{
           padding: `${spacing[3]} ${layout.margin}`,
-          paddingBottom: `calc(env(safe-area-inset-bottom) + ${spacing[3]})`,
+          // 08차 1번: 이 페이지는 <BottomNavBar/>(fixed, 하단 고정)를 같이 렌더한다.
+          // 기존엔 safe-area만 더해서 버튼이 바텀내비 밑에 깔려 안 눌렸다. 바텀내비 높이도 더한다.
+          paddingBottom: `calc(env(safe-area-inset-bottom) + ${spacing[3]} + ${layout.bottomNavHeight})`,
           backgroundColor: colors.surface.card,
           borderTop: `1px solid ${colors.gray[100]}`,
         }}>
@@ -215,7 +217,7 @@ export default function RefundPage() {
         <>
           <div
             onClick={() => setConfirming(false)}
-            className="glass-scrim"
+           
             style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 200 }}
           />
           <div style={{

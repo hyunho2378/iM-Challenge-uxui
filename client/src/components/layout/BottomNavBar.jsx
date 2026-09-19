@@ -2,14 +2,17 @@
  * BottomNavBar
  * 05차 지시서 2번: iM샵 실제 구조엔 바텀내비가 없고 햄버거 드로어 하나뿐이다(IA 병리 확정).
  * 이미 완성된 이 컴포넌트를 재사용해 바텀내비를 to-be 개선으로 얹는다.
- * 5탭: 홈·충전·결제(QR 포함)·이용내역·SHOP·쿠폰·MY. "지원금·혜택"은 iM샵에 대응 화면이 없어 제거.
+ * 08차 11번: "충전·결제"(→/qr)는 "결제매장"(→/store, 가맹점찾기)으로, "SHOP·쿠폰"(→/store)은
+ * "지원금·혜택"(→/benefits, 혜택현황 신설로 대응 화면이 생겼다)으로 바꿨다. QR결제(/qr)는
+ * 탭에서 빠졌지만 홈 카드 위젯의 QR결제 버튼으로 계속 갈 수 있다.
+ * 5탭: 홈·결제매장·이용내역·지원금·혜택·MY.
  * Strategy: Nielsen #4 consistency, Shneiderman #1
  */
 
 import { cloneElement } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Home, Store, QrCode, Receipt, User } from 'lucide-react'
-import { colors, typography, layout, spacing, md3Shape } from '../../tokens/tokens'
+import { Home, Store, Gift, Receipt, User } from 'lucide-react'
+import { colors, typography, layout, spacing, md3Shape, shadow } from '../../tokens/tokens'
 import { useTypography } from '../../hooks/useTypography'
 import { usePlatform } from '../../hooks/usePlatform'
 
@@ -20,9 +23,9 @@ export default function BottomNavBar() {
   function getActiveKey() {
     const p = location.pathname
     if (p === '/') return 'home'
-    if (p.startsWith('/qr') || p.startsWith('/charge')) return 'pay'
+    if (p.startsWith('/store') || p.startsWith('/coupon')) return 'merchant'
     if (p.startsWith('/history')) return 'history'
-    if (p.startsWith('/store') || p.startsWith('/coupon')) return 'store'
+    if (p.startsWith('/benefits')) return 'benefits'
     if (p.startsWith('/my')) return 'my'
     return ''
   }
@@ -35,8 +38,8 @@ export default function BottomNavBar() {
 
   return (
     <div
-      className="glass glass-top-only"
       style={{
+      // 08차 4번: 리퀴드글래스 제거 — 단색 배경 + 위쪽 그림자(shadow.nav)로 대체
       position: 'fixed',
       bottom: 0,
       left: '50%',
@@ -44,6 +47,8 @@ export default function BottomNavBar() {
       width: '100%',
       maxWidth: layout.viewport,
       zIndex: 200,
+      backgroundColor: colors.surface.card,
+      boxShadow: shadow.nav,
       display: 'flex',
       alignItems: 'center',
       paddingTop: isAndroid ? spacing[1] : spacing[2],
@@ -58,10 +63,10 @@ export default function BottomNavBar() {
         isAndroid={isAndroid}
       />
       <NavTab
-        label="충전·결제"
-        icon={<QrCode size={24} strokeWidth={1.8} />}
-        active={activeKey === 'pay'}
-        onClick={() => navigate('/qr')}
+        label="결제매장"
+        icon={<Store size={24} strokeWidth={1.8} />}
+        active={activeKey === 'merchant'}
+        onClick={() => navigate('/store')}
         height={NAV_HEIGHT}
         isAndroid={isAndroid}
       />
@@ -74,10 +79,10 @@ export default function BottomNavBar() {
         isAndroid={isAndroid}
       />
       <NavTab
-        label="SHOP·쿠폰"
-        icon={<Store size={24} strokeWidth={1.8} />}
-        active={activeKey === 'store'}
-        onClick={() => navigate('/store')}
+        label="지원금·혜택"
+        icon={<Gift size={24} strokeWidth={1.8} />}
+        active={activeKey === 'benefits'}
+        onClick={() => navigate('/benefits')}
         height={NAV_HEIGHT}
         isAndroid={isAndroid}
       />

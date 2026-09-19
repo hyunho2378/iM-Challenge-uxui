@@ -152,13 +152,26 @@ function userReducer(state, action) {
 
 export function UserProvider({ children }) {
   const { sessionId } = useApp()
-  const [hasCard, setHasCard] = useState(false)
-  const [cardStatus, setCardStatus] = useState('none')
+  // 08차 3번: 새로고침마다 카드 보유/미보유가 오락가락한다는 지적 — 정확히는 항상 미보유로
+  // 시작했을 뿐이지만, 데모 중 매번 카드신청 플로우를 다시 타지 않도록 처음부터 카드 보유 +
+  // 목데이터가 로드된 상태로 고정한다. registerCard()와 같은 데이터를 쓴다.
+  const [hasCard, setHasCard] = useState(true)
+  const [cardStatus, setCardStatus] = useState('registered')
   // 05차: 연결계좌 등록 상태 (PAY-01/PAY-03). 은행명 문자열 또는 미등록 시 null
   const [linkedBank, setLinkedBank] = useState(null)
   // 'charge' | 'payment' | 'refund' | null. 서버 기록에 실패한 마지막 동작
   const [lastError, setLastError] = useState(null)
-  const [state, dispatch] = useReducer(userReducer, EMPTY_INITIAL)
+  const [state, dispatch] = useReducer(userReducer, undefined, () => {
+    const mockData = generateMockData()
+    return {
+      ...EMPTY_INITIAL,
+      balance: mockData.balance,
+      cashbackBalance: mockData.cashbackBalance,
+      monthlyAccumulated: mockData.monthlyAccumulated,
+      monthlyDiscountCharged: mockData.monthlyDiscountCharged,
+      transactions: mockData.transactions,
+    }
+  })
 
   const applyCard = useCallback(() => setCardStatus('applying'), [])
   const shipCard = useCallback(() => setCardStatus('shipped'), [])

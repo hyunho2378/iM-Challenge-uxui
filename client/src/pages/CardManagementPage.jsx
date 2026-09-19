@@ -154,12 +154,13 @@ function MenuRow({ label, badge, value, onClick }) {
 }
 
 function CardThumbSVG() {
+  // 08차 0번: 카드 아트워크 실제 색(빨강)으로. 앱 UI색(보라)과 별개다
   return (
     <svg width="84" height="56" viewBox="0 0 100 64" fill="none" style={{ transform: 'rotate(-6deg)', flexShrink: 0 }}>
-      <rect width="100" height="64" rx="8" fill={colors.surface.card} fillOpacity="0.95" />
-      <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">대구로페이</text>
-      <rect x="8" y="32" width="26" height="16" rx="3" fill={colors.gray[200]} />
-      <rect x="8" y="54" width="14" height="3" rx="1.5" fill={colors.gray[300]} />
+      <rect width="100" height="64" rx="8" fill={colors.error} />
+      <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.surface.card} fontFamily="sans-serif">대구로페이</text>
+      <rect x="8" y="32" width="26" height="16" rx="3" fill="rgba(255,255,255,0.3)" />
+      <rect x="8" y="54" width="14" height="3" rx="1.5" fill="rgba(255,255,255,0.25)" />
     </svg>
   )
 }
@@ -215,7 +216,7 @@ export default function CardManagementPage() {
                 color: 'rgba(255,255,255,0.7)',
                 fontWeight: typography.weight.medium,
               }}>
-                iM샵(1)
+                대구로페이
               </p>
               <p style={{
                 margin: `${spacing[1]} 0 0 0`,

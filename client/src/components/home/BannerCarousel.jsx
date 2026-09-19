@@ -38,30 +38,6 @@ const NAVER_SLIDE = {
   ),
 }
 
-// R5: 캐시백 충전 슬라이드 — primary-100 라이트 블루 (teal-600 초록 제거)
-const BASE_SLIDES = [
-  {
-    id: 'cashback',
-    bgColor: colors.primary[100],
-    textColor: colors.primary[800],
-    subTextColor: colors.primary[700],
-    buttonBg: colors.primary[200],
-    buttonTextColor: colors.primary[800],
-    title: '캐시백 충전하고',
-    description: '대구 전역에서 사용하세요',
-    buttonLabel: '충전하기',
-    buttonPath: '/charge',
-    illustration: (
-      <svg width="76" height="64" viewBox="0 0 100 64" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transform: 'rotate(-8deg)' }}>
-        <rect x="0" y="0" width="100" height="64" rx="8" fill={colors.surface.card} />
-        <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">대구로페이</text>
-        <rect x="8" y="32" width="26" height="16" rx="3" fill={colors.gray[200]} />
-        <rect x="8" y="54" width="14" height="3" rx="1.5" fill={colors.gray[300]} />
-      </svg>
-    ),
-  },
-]
-
 const CARD_APPLY_SLIDE = {
   id: 'cardApply',
   bgColor: colors.primary[700],
@@ -93,9 +69,10 @@ export default function BannerCarousel({ applyButtonRef }) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [startX, setStartX] = useState(null)
 
+  // 08차 9번: "캐시백 충전하고" 배너 제거 — 홈 카드의 "이번 달 할인충전" 위젯이 이미 그 역할을 한다
   const slides = hasCard
-    ? [...BASE_SLIDES, KAKAO_SLIDE, NAVER_SLIDE]
-    : [CARD_APPLY_SLIDE, ...BASE_SLIDES, KAKAO_SLIDE, NAVER_SLIDE]
+    ? [KAKAO_SLIDE, NAVER_SLIDE]
+    : [CARD_APPLY_SLIDE, KAKAO_SLIDE, NAVER_SLIDE]
 
   const safeIndex = Math.min(currentIndex, slides.length - 1)
 

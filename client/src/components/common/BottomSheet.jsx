@@ -22,7 +22,6 @@ export default function BottomSheet({ isOpen, onClose, title, children }) {
       {/* 오버레이 */}
       <div
         onClick={onClose}
-        className="glass-scrim"
         style={{
           position: 'absolute',
           inset: 0,
@@ -32,13 +31,13 @@ export default function BottomSheet({ isOpen, onClose, title, children }) {
 
       {/* 시트 */}
       <div
-        className="glass"
         style={{
           position: 'relative',
           width: '100%',
           maxWidth: layout.viewport,
           marginLeft: 'auto',
           marginRight: 'auto',
+          backgroundColor: colors.surface.card,
           borderTopLeftRadius: isAndroid ? md3Shape.extraLarge : layout.radiusModal,
           borderTopRightRadius: isAndroid ? md3Shape.extraLarge : layout.radiusModal,
           boxShadow: shadow.modal,

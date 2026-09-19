@@ -7,6 +7,8 @@ import { Search, Bell } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { colors, typography, layout, spacing } from '../../tokens/tokens'
+// 08차 4번: 리퀴드글래스 제거. sticky는 자기 자리(정상 플로우)에서만 붙기 때문에
+// 앞에 있는 형제 요소(데스크탑 미리보기의 상태바)를 가리지 않는다 — 08차 5번(상태바 안 보임) 원인이었다.
 // iM샵 실캡처(S01) 로고. 자체 배경(민트-그린 그라디언트)을 내장한 아이콘이라
 // 밝은/어두운 배경 어디서든 대비가 유지된다. 배경별 변형이 따로 필요 없다.
 import Logo from '../../assets/logos/logo.png'
@@ -17,24 +19,19 @@ export default function TopAppBar() {
 
   return (
     <div
-      className="glass glass-bottom-only"
       style={{
-      // 04차: sticky는 ScreenContainer의 형제 flex 안에 있어 콘텐츠가 밑으로 지나가지 않아
-      // 유리 블러가 흐릴 대상이 없었다. fixed로 바꿔 BottomNavBar와 같은 방식으로 띄운다.
-      position: 'fixed',
+      position: 'sticky',
       top: 0,
-      left: '50%',
-      transform: 'translateX(-50%)',
-      width: '100%',
-      maxWidth: layout.viewport,
       zIndex: 100,
       height: layout.topBarHeight,
+      backgroundColor: colors.surface.card,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingLeft: layout.margin,
       paddingRight: '8px',
-      borderBottom: 'none',
+      borderBottom: `1px solid ${colors.gray[100]}`,
+      flexShrink: 0,
     }}>
       {/* 로고 + 텍스트 */}
       {/* 장식 예외: 브랜드 마크 tight grouping (디자인시스템 단계 3-B) */}

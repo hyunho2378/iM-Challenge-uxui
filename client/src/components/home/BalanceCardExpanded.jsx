@@ -7,6 +7,7 @@
 
 import { useNavigate } from 'react-router-dom'
 import { useUser, MONTHLY_DISCOUNT_LIMIT } from '../../context/UserContext'
+// 08차 9번: "캐시백 0원" 줄 제거 — 이 카드 안 "이번 달 할인충전" 위젯이 이미 그 역할을 한다
 import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
 import { usePlatform } from '../../hooks/usePlatform'
 
@@ -15,7 +16,7 @@ export default function BalanceCardExpanded({
   refundButtonRef,
 }) {
   const navigate = useNavigate()
-  const { balance, cashbackBalance, monthlyDiscountCharged } = useUser()
+  const { balance, monthlyDiscountCharged } = useUser()
   const isAndroid = usePlatform() === 'android'
 
   const fmt = (n) => n.toLocaleString('ko-KR') + '원'
@@ -74,36 +75,6 @@ export default function BalanceCardExpanded({
               {fmt(balance)}
             </span>
           </div>
-
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'baseline',
-          }}>
-            <span style={{
-              fontSize: typography.size.sm,
-              color: 'rgba(255,255,255,0.7)',
-              fontWeight: typography.weight.medium,
-            }}>
-              캐시백
-            </span>
-            <span style={{
-              fontSize: typography.size.xl,
-              color: colors.teal[400],
-              fontWeight: typography.weight.bold,
-            }}>
-              {fmt(cashbackBalance)}
-            </span>
-          </div>
-
-          {/* 04차 D-2: 잔액과 캐시백의 관계를 설명 없이 병렬로만 보여주던 문제 — 한 줄 설명 추가 */}
-          <p style={{
-            margin: 0,
-            fontSize: typography.size.xxs,
-            color: 'rgba(255,255,255,0.55)',
-          }}>
-            캐시백은 잔액과 별도로 결제에 쓸 수 있는 돈이에요
-          </p>
         </div>
 
         {/* 06차 1번: 캐시백 자동/수동 토글 → 이번 달 할인충전 한도 진행률로 교체.

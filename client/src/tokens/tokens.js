@@ -161,32 +161,6 @@ export const colors = {
   },
 };
 
-// ─── Liquid Glass (iOS 26 규격을 CSS backdrop-filter로 재현) ──────────────────
-// CSS는 tokens.js를 직접 읽지 못한다. 키를 CSS 변수명으로 두고 App.jsx가 :root에 주입한다.
-// index.css의 .glass 규칙이 이 변수들만 참조하므로 색 단일 소스가 유지된다.
-// 굴절(픽셀 변위)은 넣지 않는다. backdrop-filter로는 불가능하고, SVG feDisplacementMap은
-// Chromium 전용이라 iOS 사파리에서 어차피 폴백되며, 텍스트가 일그러져 시니어 가독을 해친다.
-export const glass = {
-  '--glass-blur': '12px',
-  '--glass-saturate': '170%',
-  '--glass-tint': 'rgba(255,255,255,0.13)',
-  '--glass-border': 'rgba(255,255,255,0.30)',
-  // specular edge. 유리 느낌의 대부분이 이 상단 흰 선에서 나온다
-  '--glass-specular-top': 'rgba(255,255,255,0.85)',
-  '--glass-specular-bottom': 'rgba(255,255,255,0.14)',
-  '--glass-drop-shadow': 'rgba(0,0,0,0.18)',
-
-  // 시니어 모드 / prefers-reduced-transparency: 유리를 끄지 않고 읽을 수 있게 낮춘다
-  '--glass-blur-senior': '4px',
-  '--glass-saturate-senior': '110%',
-  '--glass-tint-senior': 'rgba(255,255,255,0.92)',
-  '--glass-border-senior': 'rgba(17,24,39,0.18)',
-  '--glass-specular-top-senior': 'rgba(255,255,255,0.60)',
-
-  // backdrop-filter 미지원 기기 폴백 (구형 저사양 단말)
-  '--glass-tint-fallback': 'rgba(255,255,255,0.96)',
-};
-
 // ─── MD3 타입스케일 (안드로이드 브랜치 기준, rem) ─────────────────────────────
 // MD3 baseline 정확값. 단 본문은 시니어 하한 때문에 bodyLarge(1rem=16px)를 기본으로 쓴다.
 // bodyMedium/bodySmall은 스케일 완전성을 위해 두되 본문 카피에는 쓰지 않는다.

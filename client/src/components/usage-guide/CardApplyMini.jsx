@@ -13,15 +13,15 @@ const sizes = {
 function CardSVG() {
     return (
         <svg width="120" height="75" viewBox="0 0 220 138" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="220" height="138" rx="12" fill={colors.primary[700]} />
+            <rect width="220" height="138" rx="12" fill={colors.error} />
             <rect width="220" height="138" rx="12" fill="url(#cardGradMini)" />
             <defs>
                 <linearGradient id="cardGradMini" x1="0" y1="0" x2="220" y2="138" gradientUnits="userSpaceOnUse">
-                    <stop stopColor={colors.primary[600]} />
-                    <stop offset="1" stopColor={colors.primary[800]} />
+                    <stop stopColor={colors.error} />
+                    <stop offset="1" stopColor={colors.errorDark} />
                 </linearGradient>
             </defs>
-            <path d="M0 100 Q40 70 80 85 Q120 60 160 80 Q190 65 220 75 L220 138 L0 138 Z" fill={colors.primary[800]} fillOpacity="0.35" />
+            <path d="M0 100 Q40 70 80 85 Q120 60 160 80 Q190 65 220 75 L220 138 L0 138 Z" fill={colors.errorDark} fillOpacity="0.35" />
             <rect x="16" y="48" width="28" height="22" rx="4" fill={colors.illustration.cardChip} />
             <line x1="22" y1="48" x2="22" y2="70" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
             <line x1="28" y1="48" x2="28" y2="70" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
@@ -112,7 +112,7 @@ export default function CardApplyMini({ step = 'select' }) {
                     <div style={{ position: 'absolute', right: spacing[2] }}><ChevronRight size={24} color={colors.gray[700]} /></div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                    <span style={{ fontSize: sizes.md, fontWeight: typography.weight.bold, color: colors.gray[900] }}>iM샵(1)</span>
+                    <span style={{ fontSize: sizes.md, fontWeight: typography.weight.bold, color: colors.gray[900] }}>대구로페이</span>
                 </div>
             </div>
 

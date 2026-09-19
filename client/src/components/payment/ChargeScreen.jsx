@@ -141,7 +141,7 @@ function DiscountErrorModal({ amount, monthlyDiscountCharged, onStay, onGoCharge
     // 07차: 충전 코치마크(9999)가 뜬 채로 이 에러가 뜨면 코치마크가 이 모달을 가려
     // "할인 없이 충전하기" 버튼을 못 누르는 문제가 있었다. 실제 액션 모달을 항상 위에 둔다.
     <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div onClick={onStay} className="glass-scrim" style={{ position: 'absolute', inset: 0, backgroundColor: colors.surface.overlay }} />
+      <div onClick={onStay} style={{ position: 'absolute', inset: 0, backgroundColor: colors.surface.overlay }} />
       <div style={{
         position: 'relative', width: 'calc(100% - 64px)', maxWidth: '320px',
         backgroundColor: colors.surface.card, borderRadius: layout.radiusCard, padding: spacing[5], boxShadow: shadow.modal,

@@ -74,10 +74,10 @@ function MenuRow({ label, badge, value }) {
 function CardThumbSVG() {
   return (
     <svg width="84" height="56" viewBox="0 0 100 64" fill="none" style={{ transform: 'rotate(-6deg)', flexShrink: 0 }}>
-      <rect width="100" height="64" rx="8" fill={colors.surface.card} fillOpacity="0.95" />
-      <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">대구로페이</text>
-      <rect x="8" y="32" width="26" height="16" rx="3" fill={colors.gray[200]} />
-      <rect x="8" y="54" width="14" height="3" rx="1.5" fill={colors.gray[300]} />
+      <rect width="100" height="64" rx="8" fill={colors.error} />
+      <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.surface.card} fontFamily="sans-serif">대구로페이</text>
+      <rect x="8" y="32" width="26" height="16" rx="3" fill="rgba(255,255,255,0.3)" />
+      <rect x="8" y="54" width="14" height="3" rx="1.5" fill="rgba(255,255,255,0.25)" />
     </svg>
   )
 }
@@ -109,7 +109,7 @@ export default function CardManageMini({ balance = 112671 }) {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: spacing[3] }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ margin: 0, fontSize: typography.size.sm, color: 'rgba(255,255,255,0.7)', fontWeight: typography.weight.medium }}>iM샵(1)</p>
+              <p style={{ margin: 0, fontSize: typography.size.sm, color: 'rgba(255,255,255,0.7)', fontWeight: typography.weight.medium }}>대구로페이</p>
               <p style={{ margin: `${spacing[1]} 0 0 0`, fontSize: typography.size.largeTitle, fontWeight: typography.weight.bold, color: colors.onDark.primary, letterSpacing: '-0.02em', lineHeight: 1.1 }}>{fmt(balance)}</p>
             </div>
             <CardThumbSVG />

@@ -385,8 +385,8 @@ export default function HomePageLarge() {
         flex: 1,
         minHeight: 0,
         overflowY: 'auto',
-        // 04차: TopAppBarLargeText가 fixed(52px)로 바뀌어 레이아웃에서 빠졌으므로 더해준다
-        paddingTop: `calc(52px + ${spacing[3]})`,
+        // 08차 5번: TopAppBarLargeText가 sticky로 복귀해 다시 레이아웃에 잡히므로 52px 보정은 뺀다
+        paddingTop: spacing[3],
         paddingLeft: layout.margin,
         paddingRight: layout.margin,
         paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)',

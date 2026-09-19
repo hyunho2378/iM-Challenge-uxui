@@ -9,23 +9,20 @@ export default function TopAppBarLargeText() {
 
   return (
     <div
-      className="glass glass-bottom-only"
       style={{
-      // 04차: ScreenContainer 형제 배치 문제 — fixed로 바꿔 콘텐츠가 밑으로 지나가게 한다
-      position: 'fixed',
+      // 08차 4·5번: 리퀴드글래스 제거 + fixed→sticky(데스크탑 미리보기 상태바를 가리던 원인)
+      position: 'sticky',
       top: 0,
-      left: '50%',
-      transform: 'translateX(-50%)',
-      width: '100%',
-      maxWidth: layout.viewport,
       zIndex: 100,
       height: '52px',
+      backgroundColor: colors.surface.card,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingLeft: layout.margin,
       paddingRight: layout.margin,
-      borderBottom: 'none',
+      borderBottom: `1px solid ${colors.gray[100]}`,
+      flexShrink: 0,
     }}>
       {/* 로고 + 텍스트 — 큰글씨 모드에서 더 크게 */}
       {/* 장식 예외: 브랜드 마크 tight grouping (디자인시스템 단계 3-B) */}

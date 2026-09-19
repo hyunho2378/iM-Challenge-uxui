@@ -23,19 +23,20 @@ function maskCardNumber(full) {
 function CardBackSVG({ cardNumber }) {
   return (
     <svg width="100%" viewBox="0 0 280 176" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="280" height="176" rx="12" fill={colors.primary[700]} />
+      {/* 08차 0번: 카드 아트워크는 실제 색(빨강)으로. 앱 UI색(보라)과 별개다 */}
+      <rect width="280" height="176" rx="12" fill={colors.error} />
       <rect width="280" height="176" rx="12" fill="url(#backGrad)" />
       <defs>
         <linearGradient id="backGrad" x1="0" y1="0" x2="280" y2="176" gradientUnits="userSpaceOnUse">
-          <stop stopColor={colors.primary[600]} />
-          <stop offset="1" stopColor={colors.primary[800]} />
+          <stop stopColor={colors.error} />
+          <stop offset="1" stopColor={colors.errorDark} />
         </linearGradient>
       </defs>
       <rect x="0" y="28" width="280" height="44" fill="rgba(0,0,0,0.55)" />
       <rect x="16" y="92" width="180" height="32" rx="4" fill={colors.surface.card} fillOpacity="0.9" />
       <text x="24" y="113" fontSize="11" fill={colors.gray[400]} fontFamily="sans-serif">AUTHORIZED SIGNATURE</text>
       <rect x="206" y="92" width="58" height="32" rx="4" fill={colors.surface.card} fillOpacity="0.9" />
-      <text x="235" y="112" textAnchor="middle" fontSize="16" fontWeight="700" fill={colors.primary[700]} fontFamily="monospace">123</text>
+      <text x="235" y="112" textAnchor="middle" fontSize="16" fontWeight="700" fill={colors.error} fontFamily="monospace">123</text>
       <text x="225" y="86" fontSize="9" fill="rgba(255,255,255,0.65)" fontFamily="sans-serif">CVC</text>
       <text x="16" y="152" fontSize="13" fill="rgba(255,255,255,0.95)" letterSpacing="1.5" fontFamily="monospace">{cardNumber}</text>
       <text x="16" y="170" fontSize="9" fill="rgba(255,255,255,0.55)" fontFamily="sans-serif">03/36</text>

@@ -26,15 +26,17 @@ function CardSVG({ type }) {
   const isTransit = type === 'transit'
   return (
     <svg width="120" height="75" viewBox="0 0 220 138" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="220" height="138" rx="12" fill={colors.primary[700]} />
+      {/* 08차 0번: 전사.md S05/S08/S17/S28 4곳에서 확인된 실제 카드 색(빨강)으로 되돌린다.
+          앱 전체 UI색(보라)과는 별개 — 카드 아트워크에만 적용한다. */}
+      <rect width="220" height="138" rx="12" fill={colors.error} />
       <rect width="220" height="138" rx="12" fill="url(#cardGrad)" />
       <defs>
         <linearGradient id="cardGrad" x1="0" y1="0" x2="220" y2="138" gradientUnits="userSpaceOnUse">
-          <stop stopColor={colors.primary[600]} />
-          <stop offset="1" stopColor={colors.primary[800]} />
+          <stop stopColor={colors.error} />
+          <stop offset="1" stopColor={colors.errorDark} />
         </linearGradient>
       </defs>
-      <path d="M0 100 Q40 70 80 85 Q120 60 160 80 Q190 65 220 75 L220 138 L0 138 Z" fill={colors.primary[800]} fillOpacity="0.35" />
+      <path d="M0 100 Q40 70 80 85 Q120 60 160 80 Q190 65 220 75 L220 138 L0 138 Z" fill={colors.errorDark} fillOpacity="0.35" />
       <rect x="16" y="48" width="28" height="22" rx="4" fill={colors.illustration.cardChip} />
       <line x1="22" y1="48" x2="22" y2="70" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
       <line x1="28" y1="48" x2="28" y2="70" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
@@ -57,14 +59,14 @@ function CardSVG({ type }) {
 const CARD_TYPES = [
   {
     id: 'standard',
-    name: 'iM샵(1)',
+    name: '대구로페이',
     badges: [],
     cost: null,
   },
   {
     id: 'transit',
-    name: 'iM샵(교통)',
-    badges: ['교통카드 겸용'],
+    name: '대구로페이(교통카드 겸용)',
+    badges: [],
     cost: '발급 비용 5,000원',
   },
 ]
@@ -297,10 +299,10 @@ export default function CardApplyPage() {
                   이 카드로 결제하는 방법
                 </p>
                 <p style={{ margin: `0 0 ${spacing[2]}`, fontSize: sizes.xs, color: colors.gray[700], lineHeight: typography.lineHeight.body }}>
-                  <b>QR결제</b> — 가맹점의 QR코드를 스캔하면 바로 결제할 수 있어요.
+                  <b>QR결제</b>: 가맹점의 QR코드를 스캔하면 바로 결제할 수 있어요.
                 </p>
                 <p style={{ margin: 0, fontSize: sizes.xs, color: colors.gray[700], lineHeight: typography.lineHeight.body }}>
-                  <b>삼성페이 등록</b> — 삼성페이 앱에 이 카드를 등록하면 QR코드가 없는 가맹점에서도 결제할 수 있어요.
+                  <b>삼성페이 등록</b>: 삼성페이 앱에 이 카드를 등록하면 QR코드가 없는 가맹점에서도 결제할 수 있어요.
                 </p>
               </div>
             </div>
