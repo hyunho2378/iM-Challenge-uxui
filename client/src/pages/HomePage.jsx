@@ -235,7 +235,7 @@ export default function HomePage() {
       {coachStep === 'homeIntro' && (
         <CoachMarkOverlay
           targetRef={actionRowRef}
-          message="카드가 등록됐어요. 위에 잔액이 보이고, 아래 세 버튼로 [충전] [환불] [QR결제]를 모두 할 수 있습니다."
+          message="카드가 등록됐어요. 위에 잔액이 보이고, 아래 세 버튼으로 [충전] [환불] [QR결제]를 모두 할 수 있습니다."
           step={1}
           totalSteps={3}
           onNext={() => markSeen('homeIntro')}
