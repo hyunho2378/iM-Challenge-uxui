@@ -25,6 +25,8 @@ function CardThumb() {
 export default function BalanceCardExpanded({
   chargeButtonRef,
   refundButtonRef,
+  // 10차 3번: 홈 최초 진입 코치마크가 충전·환불·QR결제 3버튼을 한 덯어리로 집는다
+  actionRowRef,
 }) {
   const navigate = useNavigate()
   const { balance, monthlyDiscountCharged } = useUser()
@@ -174,7 +176,7 @@ export default function BalanceCardExpanded({
         })()}
 
         {/* 충전 / 환불 / QR결제 — 글래스 톤 통일 */}
-        <div style={{
+        <div ref={actionRowRef} style={{
           display: 'flex',
           gap: spacing[2],
           paddingTop: spacing[3],

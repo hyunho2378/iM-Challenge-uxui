@@ -19,6 +19,12 @@ export function OnboardingProvider({ children }) {
   const [hasSeenAccountLinkCoach, setHasSeenAccountLinkCoach] = useState(false)
   const [hasSeenChargeFreeCoach, setHasSeenChargeFreeCoach] = useState(false)
   const [hasSeenRefundPageCoach, setHasSeenRefundPageCoach] = useState(false)
+  // 10차 3번: 시니어 접근성이 이 프로젝트 핵심이라 안내가 비어 있던 네 화면에도 코치마크를 달았다.
+  // homeIntro: 홈 최초 진입(카드 보유 상태 1회) / qrScan: QR결제 / history: 이용내역 / storeMap: 결제매장
+  const [hasSeenHomeIntroCoach, setHasSeenHomeIntroCoach] = useState(false)
+  const [hasSeenQRScanCoach, setHasSeenQRScanCoach] = useState(false)
+  const [hasSeenHistoryCoach, setHasSeenHistoryCoach] = useState(false)
+  const [hasSeenStoreMapCoach, setHasSeenStoreMapCoach] = useState(false)
 
   const markSeen = useCallback((key) => {
     if (key === 'cardApply') setHasSeenCardApplyCoach(true)
@@ -30,9 +36,15 @@ export function OnboardingProvider({ children }) {
     else if (key === 'accountLink') setHasSeenAccountLinkCoach(true)
     else if (key === 'chargeFree') setHasSeenChargeFreeCoach(true)
     else if (key === 'refundPage') setHasSeenRefundPageCoach(true)
+    else if (key === 'homeIntro') setHasSeenHomeIntroCoach(true)
+    else if (key === 'qrScan') setHasSeenQRScanCoach(true)
+    else if (key === 'history') setHasSeenHistoryCoach(true)
+    else if (key === 'storeMap') setHasSeenStoreMapCoach(true)
   }, [])
 
+  // 홈에서 건너뛰기를 누르면 홈 안의 단계(소개·충전·환불)를 한번에 닫는다.
   const completeAllCoachmarks = useCallback(() => {
+    setHasSeenHomeIntroCoach(true)
     setHasSeenCardApplyCoach(true)
     setHasSeenChargeCoach(true)
     setHasSeenRefundCoach(true)
@@ -43,6 +55,7 @@ export function OnboardingProvider({ children }) {
       hasSeenCardApplyCoach, hasSeenChargeCoach, hasSeenRefundCoach, hasSeenCashbackModal,
       hasSeenCardApplyFlowCoach, hasSeenChargeFlowCoach, hasSeenAccountLinkCoach, hasSeenChargeFreeCoach,
       hasSeenRefundPageCoach,
+      hasSeenHomeIntroCoach, hasSeenQRScanCoach, hasSeenHistoryCoach, hasSeenStoreMapCoach,
       markSeen, completeAllCoachmarks,
     }}>
       {children}

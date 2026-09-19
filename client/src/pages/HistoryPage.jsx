@@ -5,14 +5,16 @@
  * Nielsen #1 visibility, #3 user control, #6 recognition
  */
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Receipt } from 'lucide-react'
 import { useUser } from '../context/UserContext'
 import { colors, typography, layout, spacing } from '../tokens/tokens'
 import { formatDate } from '../utils/date'
 import { useTypography } from '../hooks/useTypography'
+import { useOnboarding } from '../context/OnboardingContext'
 import ScreenContainer from '../components/layout/ScreenContainer'
+import CoachMarkOverlay from '../components/common/CoachMarkOverlay'
 import BottomNavBar from '../components/layout/BottomNavBar'
 import Button from '../components/common/Button'
 
@@ -37,6 +39,11 @@ export default function HistoryPage() {
 
   const [typeFilter, setTypeFilter] = useState('all')
   const [periodFilter, setPeriodFilter] = useState(null)
+
+  // 10차 3번: 이용내역 코치마크. 충전/환불/결제를 구분해 볼 수 있다는 걸 필터 바에서 알린다.
+  const { hasSeenHistoryCoach, markSeen } = useOnboarding()
+  const filterBarRef = useRef(null)
+  const [historyCoachStep, setHistoryCoachStep] = useState(hasSeenHistoryCoach ? 0 : 1)
 
   // 카드 미신청 시 빈 상태 — BottomNav 진입 가능 페이지라 카드 미신청 사용자도 도달 가능
   if (!hasCard) {
@@ -155,7 +162,7 @@ export default function HistoryPage() {
       </div>
 
       {/* 필터 바 */}
-      <div style={{
+      <div ref={filterBarRef} style={{
         backgroundColor: colors.surface.card,
         borderBottom: `1px solid ${colors.gray[100]}`,
         padding: `${spacing[2]} ${layout.margin}`,
@@ -386,6 +393,19 @@ export default function HistoryPage() {
       </div>
 
       <BottomNavBar />
+
+      {/* 10차 3번: 이용내역 코치마크 */}
+      {historyCoachStep === 1 && (
+        <CoachMarkOverlay
+          targetRef={filterBarRef}
+          placement="bottom"
+          message="위쪽 [전체] [충전] [결제] [환불] 칩으로 보고 싶은 내역만 골라 볼 수 있습니다. 아래 월 칩을 누르면 그 달의 내역만 모아 보여줍니다."
+          step={1}
+          totalSteps={1}
+          onNext={() => { markSeen('history'); setHistoryCoachStep(0) }}
+          onSkip={() => { markSeen('history'); setHistoryCoachStep(0) }}
+        />
+      )}
     </ScreenContainer>
   )
 }

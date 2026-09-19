@@ -6,7 +6,41 @@ import { colors, spacing, layout, shadow, typography } from '../tokens/tokens'
 import ScreenContainer from '../components/layout/ScreenContainer'
 import BottomNavBar from '../components/layout/BottomNavBar'
 import TopAppBarLargeText from '../components/layout/TopAppBarLargeText'
+import WidgetAddBanner from '../components/home/WidgetAddBanner'
 import { ChevronRight, Receipt, HelpCircle } from 'lucide-react'
+
+// 10차 1번: 일반 홈과 동일한 순서를 맞추기 위한 프로모션 배너(큰글씨판).
+// 지금까지 큰글씨 홈에는 위젯 배너도 iM뱅크 배너도 아예 없었다.
+// 문구는 전사.md S07 배너 원문 그대로, 글자 크기만 sizes를 따른다.
+function PromoBannerLarge({ sizes }) {
+  return (
+    <div style={{
+      padding: spacing[5],
+      borderRadius: layout.radiusCard,
+      backgroundColor: colors.primary[100],
+      fontFamily: typography.fontFamily,
+    }}>
+      <p style={{
+        margin: 0,
+        fontSize: sizes.sm,
+        fontWeight: typography.weight.semibold,
+        color: colors.primary[700],
+      }}>
+        iM뱅크 | 현대카드M
+      </p>
+      <p style={{
+        margin: `${spacing[2]} 0 0`,
+        fontSize: sizes.lg,
+        fontWeight: typography.weight.bold,
+        color: colors.primary[800],
+        lineHeight: 1.35,
+        wordBreak: 'keep-all',
+      }}>
+        최대 5% M포인트 적립<br />7만원 캐시백
+      </p>
+    </div>
+  )
+}
 
 // 잔액 카드 (다크) — iM샵 + balance + [충전(흰)][QR결제(글래스)]
 function BalanceCardLarge({ balance, sizes, navigate, fmt, btnRadius }) {
@@ -394,6 +428,14 @@ export default function HomePageLarge() {
         flexDirection: 'column',
         gap: spacing[4],
       }}>
+        {/* 10차 1번: 일반 홈과 같은 순서 — 위젯 추가 → iM뱅크 배너 → 잔액카드 → …
+            WidgetAddBanner는 자체 좌우 여백을 가지고 있어, 이미 padding이 걸린 큰글씨 컨테이너에서는
+            음수 마진으로 상쇄해 다른 카드와 왼쪽 끝을 맞춘다. */}
+        <div style={{ margin: `0 -${layout.margin}` }}>
+          <WidgetAddBanner />
+        </div>
+        <PromoBannerLarge sizes={sizes} />
+
         {!hasCard ? (
           <CardApplyCTALarge sizes={sizes} navigate={navigate} btnRadius={btnRadius} />
         ) : (

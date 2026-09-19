@@ -12,7 +12,9 @@ import { useNavigate } from 'react-router-dom'
 import { useUser } from '../../context/UserContext'
 import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
 import { usePlatform } from '../../hooks/usePlatform'
+import { useOnboarding } from '../../context/OnboardingContext'
 import Button from '../common/Button'
+import CoachMarkOverlay from '../common/CoachMarkOverlay'
 
 const LOW_BALANCE = 10000
 
@@ -63,6 +65,12 @@ export default function QRScannerScreen({ onClose, balance = 120000, onCharge, c
 
   const scannedRef = useRef(false)
   const payTimerRef = useRef(null)
+
+  // 10차 3번: QR결제 코치마크. 카메라 영역과 하단 잔액 패널을 차례로 집는다.
+  const { hasSeenQRScanCoach, markSeen } = useOnboarding()
+  const viewfinderRef = useRef(null)
+  const balancePanelRef = useRef(null)
+  const [qrCoachStep, setQrCoachStep] = useState(hasSeenQRScanCoach ? 0 : 1)
 
   // Q-03: 스캔 상태 펄스 피드백 (Nielsen #1)
   useEffect(() => {
@@ -207,6 +215,7 @@ export default function QRScannerScreen({ onClose, balance = 120000, onCharge, c
 
   return (
     <div
+      id="qr-scanner-screen"
       style={{
         position: 'fixed',
         inset: 0,
@@ -263,7 +272,7 @@ export default function QRScannerScreen({ onClose, balance = 120000, onCharge, c
           gap: spacing[4],
         }}
       >
-        <div style={{ position: 'relative', width: '300px', height: '300px' }}>
+        <div ref={viewfinderRef} style={{ position: 'relative', width: '300px', height: '300px' }}>
           {/* html5-qrcode 마운트 대상 */}
           <div
             id="qr-reader"
@@ -398,6 +407,7 @@ export default function QRScannerScreen({ onClose, balance = 120000, onCharge, c
 
       {/* 하단 카드 패널 */}
       <div
+        ref={balancePanelRef}
         style={{
           backgroundColor: colors.surface.card,
           borderTopLeftRadius: '20px',
@@ -597,6 +607,31 @@ export default function QRScannerScreen({ onClose, balance = 120000, onCharge, c
             </div>
           </div>
         </div>
+      )}
+
+      {/* 10차 3번: QR결제 코치마크 — 기존 화면과 같은 스포트라이트+말풍선+건너뛰기/다음 패턴 */}
+      {qrCoachStep === 1 && (
+        <CoachMarkOverlay
+          containerId="qr-scanner-screen"
+          targetRef={viewfinderRef}
+          message="가맹점에 붙어 있는 QR 코드를 이 네모 안에 비추면 결제 금액이 자동으로 뜹니다. 금액을 확인하고 [결제하기]를 누르면 끝입니다."
+          step={1}
+          totalSteps={2}
+          onNext={() => setQrCoachStep(2)}
+          onSkip={() => { markSeen('qrScan'); setQrCoachStep(0) }}
+        />
+      )}
+
+      {qrCoachStep === 2 && (
+        <CoachMarkOverlay
+          containerId="qr-scanner-screen"
+          targetRef={balancePanelRef}
+          message="여기에서 쓸 수 있는 잔액을 확인합니다. 잔액이 모자라면 [충전하러 가기] 버튼이 나타나고, 누르면 충전 화면으로 바로 넘어갑니다."
+          step={2}
+          totalSteps={2}
+          onNext={() => { markSeen('qrScan'); setQrCoachStep(0) }}
+          onSkip={() => { markSeen('qrScan'); setQrCoachStep(0) }}
+        />
       )}
     </div>
   )

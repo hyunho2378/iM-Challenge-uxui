@@ -10,7 +10,9 @@ import { useState, useLayoutEffect, useEffect } from 'react'
 import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
 import { usePlatform } from '../../hooks/usePlatform'
 
-export default function CoachMarkOverlay({ targetRef, message, step, totalSteps, onNext, onSkip, placement = 'top' }) {
+// 10차 3번: QR 스캐너처럼 ScreenContainer 밖에서 전체화면으로 열리는 화면은
+// #screen-container가 없어 오버레이가 그려지지 않았다. 기준 요소 id를 바꿀 수 있게 둔다.
+export default function CoachMarkOverlay({ targetRef, message, step, totalSteps, onNext, onSkip, placement = 'top', containerId = 'screen-container' }) {
   const isAndroid = usePlatform() === 'android'
   const [containerRect, setContainerRect] = useState(null)
   const [targetRect, setTargetRect] = useState(null)
@@ -24,7 +26,7 @@ export default function CoachMarkOverlay({ targetRef, message, step, totalSteps,
 
   useLayoutEffect(() => {
     const updateRects = () => {
-      const container = document.getElementById('screen-container')
+      const container = document.getElementById(containerId)
       if (container) setContainerRect(container.getBoundingClientRect())
       if (targetRef?.current) setTargetRect(targetRef.current.getBoundingClientRect())
     }
@@ -41,7 +43,7 @@ export default function CoachMarkOverlay({ targetRef, message, step, totalSteps,
       cancelAnimationFrame(raf2)
       window.removeEventListener('resize', updateRects)
     }
-  }, [targetRef])
+  }, [targetRef, containerId])
 
   if (!containerRect) return null
 

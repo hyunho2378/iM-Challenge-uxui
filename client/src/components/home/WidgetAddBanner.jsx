@@ -6,8 +6,12 @@
  */
 import { useState, useEffect, useRef } from 'react'
 import { colors, typography, layout, spacing } from '../../tokens/tokens'
+import { useTypography } from '../../hooks/useTypography'
 
 export default function WidgetAddBanner() {
+  // 10차 1번: 큰글씨 홈(HomePageLarge)에도 같은 순서로 올리기 때문에
+  // 고정 typography.size 대신 큰글씨 모드를 따라가는 sizes를 쓴다.
+  const sizes = useTypography()
   const [expanded, setExpanded] = useState(false)
   const timerRef = useRef(null)
 
@@ -38,7 +42,7 @@ export default function WidgetAddBanner() {
           border: `1px solid ${colors.primary[100]}`,
           borderRadius: layout.radiusPill,
           padding: `${spacing[1]} ${spacing[3]}`,
-          fontSize: typography.size.xs,
+          fontSize: sizes.xs,
           fontWeight: typography.weight.semibold,
           color: colors.primary[700],
           cursor: 'pointer',
@@ -60,7 +64,7 @@ export default function WidgetAddBanner() {
           backgroundColor: colors.surface.card,
           border: `1px solid ${colors.gray[200]}`,
           borderRadius: layout.radiusSmall,
-          maxHeight: expanded ? '160px' : '0px',
+          maxHeight: expanded ? '220px' : '0px',
           opacity: expanded ? 1 : 0,
           marginTop: expanded ? spacing[2] : '0px',
           overflow: 'hidden',
@@ -81,12 +85,12 @@ export default function WidgetAddBanner() {
             }}
           >
             <div>
-              <div style={{ fontSize: typography.size.xxs, color: colors.onDark.secondary, marginBottom: '1px' }}>
+              <div style={{ fontSize: sizes.xxs, color: colors.onDark.secondary, marginBottom: '1px' }}>
                 잔액
               </div>
               <div
                 style={{
-                  fontSize: typography.size.md,
+                  fontSize: sizes.md,
                   fontWeight: typography.weight.bold,
                   color: colors.onDark.primary,
                   letterSpacing: '-0.02em',
@@ -97,7 +101,7 @@ export default function WidgetAddBanner() {
             </div>
             <div
               style={{
-                fontSize: typography.size.xxs,
+                fontSize: sizes.xxs,
                 color: colors.onDark.secondary,
                 fontWeight: typography.weight.medium,
               }}
@@ -109,7 +113,7 @@ export default function WidgetAddBanner() {
             style={{
               margin: 0,
               padding: `0 ${spacing[3]}`,
-              fontSize: typography.size.xs,
+              fontSize: sizes.xs,
               color: colors.gray[700],
               lineHeight: typography.lineHeight.normal,
               wordBreak: 'keep-all',

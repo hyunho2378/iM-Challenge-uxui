@@ -18,7 +18,9 @@ import {
 import CategoryFilterChip from './CategoryFilterChip'
 import StoreListItem from './StoreListItem'
 import StoreDetailSheet from './StoreDetailSheet'
+import CoachMarkOverlay from '../common/CoachMarkOverlay'
 import { usePlatform } from '../../hooks/usePlatform'
+import { useOnboarding } from '../../context/OnboardingContext'
 
 // St-03: 카테고리 아이콘 (S6, Nielsen #6)
 const CATEGORY_ICONS = {
@@ -162,6 +164,12 @@ export default function StoreMapScreen() {
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const searchContainerRef = useRef(null)
   const [searchFocused, setSearchFocused] = useState(false)
+
+  // 10차 3번: 결제매장 코치마크. 카테고리 칩과 지도를 차례로 집는다.
+  const { hasSeenStoreMapCoach, markSeen } = useOnboarding()
+  const categoryBarRef = useRef(null)
+  const mapAreaRef = useRef(null)
+  const [storeCoachStep, setStoreCoachStep] = useState(hasSeenStoreMapCoach ? 0 : 1)
   const isAndroid = usePlatform() === 'android'
 
   const { isLoaded } = useJsApiLoader({
@@ -329,7 +337,7 @@ export default function StoreMapScreen() {
       }}
     >
       {/* 지도 영역: 55% — ScreenContainer fullBleedTop으로 statusBar 영역 처리 */}
-      <div style={{ height: '55%', position: 'relative', flexShrink: 0, overflow: 'hidden' }}>
+      <div ref={mapAreaRef} style={{ height: '55%', position: 'relative', flexShrink: 0, overflow: 'hidden' }}>
         {isLoaded ? (
           <GoogleMap
             mapContainerStyle={{ width: '100%', height: '100%' }}
@@ -546,6 +554,7 @@ export default function StoreMapScreen() {
 
         {/* 카테고리 필터칩 행 */}
         <div
+          ref={categoryBarRef}
           style={{
             position: 'absolute',
             top: `calc(${layout.topBarHeight} + 48px + ${spacing[2]})`,
@@ -689,6 +698,31 @@ export default function StoreMapScreen() {
         onNavigate={handleNavigate}
         store={selectedStore}
       />
+
+      {/* 10차 3번: 결제매장 코치마크 */}
+      {storeCoachStep === 1 && (
+        <CoachMarkOverlay
+          targetRef={categoryBarRef}
+          placement="bottom"
+          message="음식점, 카페, 마트처럼 원하는 업종을 누르면 그 업종의 가맹점만 걸러서 보여줍니다. 한 번 더 누르면 필터가 풀립니다."
+          step={1}
+          totalSteps={2}
+          onNext={() => setStoreCoachStep(2)}
+          onSkip={() => { markSeen('storeMap'); setStoreCoachStep(0) }}
+        />
+      )}
+
+      {storeCoachStep === 2 && (
+        <CoachMarkOverlay
+          targetRef={mapAreaRef}
+          placement="bottom"
+          message="지도에서 가맹점 위치를 확인할 수 있습니다. 지도의 표시나 아래 목록을 누르면 가게 정보와 길찾기가 열립니다."
+          step={2}
+          totalSteps={2}
+          onNext={() => { markSeen('storeMap'); setStoreCoachStep(0) }}
+          onSkip={() => { markSeen('storeMap'); setStoreCoachStep(0) }}
+        />
+      )}
     </div>
   )
 }

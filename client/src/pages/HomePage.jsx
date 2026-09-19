@@ -62,6 +62,7 @@ export default function HomePage() {
   const { hasCard } = useUser()
   const {
     hasSeenCardApplyCoach,
+    hasSeenHomeIntroCoach,
     hasSeenChargeCoach,
     hasSeenRefundCoach,
     markSeen,
@@ -71,13 +72,21 @@ export default function HomePage() {
   const chargeButtonRef = useRef(null)
   const refundButtonRef = useRef(null)
   const applyButtonRef = useRef(null)
+  // 10차 3번: 홈 최초 진입 안내가 집는 3버튼 행
+  const actionRowRef = useRef(null)
 
-  const [coachStep, setCoachStep] = useState(null) // 'cardApply' | 'charge' | 'refund' | null
+  const [coachStep, setCoachStep] = useState(null) // 'cardApply' | 'homeIntro' | 'charge' | 'refund' | null
 
   // B4: 코치마크 자동 노출 단계 결정
+  // 10차 3번: 카드를 등록하면 먼저 "여기에 뭐가 있는지"를 한 번 알려주고(homeIntro),
+  // 그다음에 충전·환불 버튼을 개별로 집는다.
   useEffect(() => {
     if (!hasCard && !hasSeenCardApplyCoach) {
       setCoachStep('cardApply')
+      return
+    }
+    if (hasCard && !hasSeenHomeIntroCoach) {
+      setCoachStep('homeIntro')
       return
     }
     if (hasCard && !hasSeenChargeCoach) {
@@ -89,7 +98,7 @@ export default function HomePage() {
       return
     }
     setCoachStep(null)
-  }, [hasCard, hasSeenCardApplyCoach, hasSeenChargeCoach, hasSeenRefundCoach])
+  }, [hasCard, hasSeenCardApplyCoach, hasSeenHomeIntroCoach, hasSeenChargeCoach, hasSeenRefundCoach])
 
   if (isLargeText) return <HomePageLarge />
 
@@ -105,23 +114,8 @@ export default function HomePage() {
           backgroundColor: colors.surface.background,
         }}
       >
-        {/* 04차 4번: 핵심 태스크(잔액/충전)를 프로모션보다 위로. iM샵 원본도 이 순서가 문제였다 */}
-        {hasCard ? (
-          <>
-            <BalanceCardExpanded
-              chargeButtonRef={chargeButtonRef}
-              refundButtonRef={refundButtonRef}
-            />
-            {/* B7: 진입 카드 — 06차 5번: 죽은 /cashback 대신 새 혜택 현황 페이지로 연결 */}
-            <div style={{ marginTop: spacing[2] }}>
-              <CashbackEntryCard onClick={() => navigate('/benefits')} />
-            </div>
-          </>
-        ) : (
-          // B6: 신규 사용자 CTA 카드
-          <CardApplyCTA applyButtonRef={applyButtonRef} />
-        )}
-
+        {/* 10차 1번: 전사.md 원본 배치로 되돌린다 — 위젯 추가 → iM뱅크 배너 → 잔액카드 →
+            혜택 현황 → 결제 가능 매장. 04차에 '핵심 태스크를 프로모션보다 위로' 올렸던 판단을 철회. */}
         {/* H-01: 위젯 추가 배너 */}
         <WidgetAddBanner />
 
@@ -152,6 +146,22 @@ export default function HomePage() {
             최대 5% M포인트 적립<br />7만원 캐시백
           </p>
         </div>
+
+        {hasCard ? (
+          <>
+            <BalanceCardExpanded
+              chargeButtonRef={chargeButtonRef}
+              refundButtonRef={refundButtonRef}
+            />
+            {/* B7: 진입 카드 — 06차 5번: 죽은 /cashback 대신 새 혜택 현황 페이지로 연결 */}
+            <div style={{ marginTop: spacing[2] }}>
+              <CashbackEntryCard onClick={() => navigate('/benefits')} />
+            </div>
+          </>
+        ) : (
+          // B6: 신규 사용자 CTA 카드
+          <CardApplyCTA applyButtonRef={applyButtonRef} />
+        )}
 
         {/* 결제 가능 매장 */}
         <SectionHeader
@@ -221,12 +231,24 @@ export default function HomePage() {
         />
       )}
 
+      {/* 10차 3번: 홈 최초 진입 — 잔액과 3버튼이 여기 있다는 것부터 알리고 시작한다 */}
+      {coachStep === 'homeIntro' && (
+        <CoachMarkOverlay
+          targetRef={actionRowRef}
+          message="카드가 등록됐어요. 위에 잔액이 보이고, 아래 세 버튼로 [충전] [환불] [QR결제]를 모두 할 수 있습니다."
+          step={1}
+          totalSteps={3}
+          onNext={() => markSeen('homeIntro')}
+          onSkip={() => completeAllCoachmarks()}
+        />
+      )}
+
       {coachStep === 'charge' && (
         <CoachMarkOverlay
           targetRef={chargeButtonRef}
           message="[충전] 버튼을 눌러 iM샵 잔액을 충전할 수 있습니다."
-          step={1}
-          totalSteps={2}
+          step={2}
+          totalSteps={3}
           onNext={() => markSeen('charge')}
           onSkip={() => completeAllCoachmarks()}
         />
@@ -236,8 +258,8 @@ export default function HomePage() {
         <CoachMarkOverlay
           targetRef={refundButtonRef}
           message="[환불] 버튼으로 충전한 금액을 다시 환불받을 수 있습니다."
-          step={2}
-          totalSteps={2}
+          step={3}
+          totalSteps={3}
           onNext={() => markSeen('refund')}
           onSkip={() => completeAllCoachmarks()}
         />
