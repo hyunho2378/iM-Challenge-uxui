@@ -98,19 +98,42 @@ export default function CoachMarkOverlay({ targetRef, message, step, totalSteps,
       }}
     >
       {relativeTarget ? (
-        <div
-          style={{
-            position: 'absolute',
-            top: relativeTarget.top - 6,
-            left: relativeTarget.left - 6,
-            width: relativeTarget.width + 12,
-            height: relativeTarget.height + 12,
-            borderRadius: isAndroid ? layout.radiusPill : layout.radiusButton,
-            boxShadow: '0 0 0 9999px rgba(0,0,0,0.65)',
-            border: '2px solid rgba(255,255,255,0.55)',
-            pointerEvents: 'none',
-          }}
-        />
+        // 10차 3번: 이전에는 구멍 뒤로 boxShadow '0 0 0 9999px'를 깔아 화면을 어둡혔다.
+        // 그런데 spread가 이렇게 크면 크롬이 그리기를 건너뛰어, 딥이 아예 안 보이고
+        // 말풍선만 떠 있는 상태로 보였다(스크린샷으로 확인). 위/아래/왼/오른 데 장으로
+        // 다시 그려 가운데만 뚫린다. 보이는 모양은 똑같다.
+        <>
+          {(() => {
+            const hole = {
+              top: relativeTarget.top - 6,
+              left: relativeTarget.left - 6,
+              width: relativeTarget.width + 12,
+              height: relativeTarget.height + 12,
+            }
+            const dim = 'rgba(0,0,0,0.65)'
+            const base = { position: 'absolute', backgroundColor: dim, pointerEvents: 'none' }
+            return (
+              <>
+                <div style={{ ...base, top: 0, left: 0, right: 0, height: Math.max(0, hole.top) }} />
+                <div style={{ ...base, top: hole.top + hole.height, left: 0, right: 0, bottom: 0 }} />
+                <div style={{ ...base, top: hole.top, left: 0, width: Math.max(0, hole.left), height: hole.height }} />
+                <div style={{ ...base, top: hole.top, left: hole.left + hole.width, right: 0, height: hole.height }} />
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: hole.top,
+                    left: hole.left,
+                    width: hole.width,
+                    height: hole.height,
+                    borderRadius: isAndroid ? layout.radiusPill : layout.radiusButton,
+                    border: '2px solid rgba(255,255,255,0.55)',
+                    pointerEvents: 'none',
+                  }}
+                />
+              </>
+            )
+          })()}
+        </>
       ) : (
         <div style={{
           position: 'absolute',
