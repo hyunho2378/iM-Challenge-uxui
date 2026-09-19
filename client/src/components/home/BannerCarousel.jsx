@@ -2,25 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../../context/UserContext'
 import { colors, typography, layout, spacing } from '../../tokens/tokens'
-import KakaoLogo from '../../assets/icons/Kakao.svg'
 import NaverLogo from '../../assets/icons/Naver.svg'
 import { usePlatform } from '../../hooks/usePlatform'
-
-const KAKAO_SLIDE = {
-  id: 'kakao',
-  bgColor: colors.kakaoBg,
-  textColor: colors.kakaoDark,
-  subTextColor: colors.explore.amberDark,
-  title: '카카오페이로도\n결제하세요',
-  description: '카카오페이와 연결하면 더 편리해요',
-  illustration: (
-    <img
-      src={KakaoLogo}
-      alt="카카오페이"
-      style={{ height: '40px', objectFit: 'contain' }}
-    />
-  ),
-}
 
 const NAVER_SLIDE = {
   id: 'naver',
@@ -71,8 +54,8 @@ export default function BannerCarousel({ applyButtonRef }) {
 
   // 08차 9번: "캐시백 충전하고" 배너 제거 — 홈 카드의 "이번 달 할인충전" 위젯이 이미 그 역할을 한다
   const slides = hasCard
-    ? [KAKAO_SLIDE, NAVER_SLIDE]
-    : [CARD_APPLY_SLIDE, KAKAO_SLIDE, NAVER_SLIDE]
+    ? [NAVER_SLIDE]
+    : [CARD_APPLY_SLIDE, NAVER_SLIDE]
 
   const safeIndex = Math.min(currentIndex, slides.length - 1)
 
@@ -125,8 +108,7 @@ export default function BannerCarousel({ applyButtonRef }) {
           <div
             key={slide.id}
             onClick={() => {
-              if (slide.id === 'kakao') navigate('/kakao-guide')
-              else if (slide.id === 'naver') navigate('/naver-guide')
+              if (slide.id === 'naver') navigate('/naver-guide')
             }}
             style={{
               width: '100%',
@@ -138,7 +120,7 @@ export default function BannerCarousel({ applyButtonRef }) {
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: `0 ${spacing[4]} 0 ${spacing[5]}`,
-              cursor: (slide.id === 'kakao' || slide.id === 'naver') ? 'pointer' : 'default',
+              cursor: slide.id === 'naver' ? 'pointer' : 'default',
             }}
           >
             {/* 좌측 텍스트 */}
@@ -161,7 +143,7 @@ export default function BannerCarousel({ applyButtonRef }) {
               }}>
                 {slide.description}
               </p>
-              {slide.buttonLabel && slide.id !== 'kakao' && hasCard && (
+              {slide.buttonLabel && hasCard && (
                 <button
                   ref={slide.id === 'cardApply' ? applyButtonRef : undefined}
                   onClick={(e) => {
@@ -206,7 +188,7 @@ export default function BannerCarousel({ applyButtonRef }) {
         display: 'flex',
         alignItems: 'center',
       }}>
-        {slides.map((_, idx) => (
+        {slides.length > 1 && slides.map((_, idx) => (
           <button
             key={idx}
             onClick={() => { setCurrentIndex(idx) }}

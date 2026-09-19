@@ -7,9 +7,6 @@ const defaultStores = [
   { id: 3, name: '동성로 카페거리', category: '카페', distance: '0.8km' },
 ]
 
-const storeColors = [colors.primary[100], colors.tag.cashBg, colors.tag.voucherBg]
-const iconColors = [colors.primary[700], colors.tag.cashText, colors.tag.voucherText]
-
 function StoreIcon({ color }) {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -38,7 +35,7 @@ export default function StoreRecommendCard({ stores = defaultStores }) {
         msOverflowStyle: 'none',
       }}
     >
-      {stores.map((store, idx) => (
+      {stores.map((store) => (
         <div
           key={store.id}
           onClick={() => navigate('/store', { state: { focusStoreId: store.id } })}
@@ -62,13 +59,13 @@ export default function StoreRecommendCard({ stores = defaultStores }) {
               width: '36px',
               height: '36px',
               borderRadius: '50%',
-              backgroundColor: storeColors[idx % storeColors.length],
+              backgroundColor: colors.primary[100],
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <StoreIcon color={iconColors[idx % iconColors.length]} />
+            <StoreIcon color={colors.primary[700]} />
           </div>
 
           {/* 매장명 */}

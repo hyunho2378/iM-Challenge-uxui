@@ -11,6 +11,17 @@ import { useUser, MONTHLY_DISCOUNT_LIMIT } from '../../context/UserContext'
 import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
 import { usePlatform } from '../../hooks/usePlatform'
 
+// 전사.md S08/S17: 대구로페이 카드는 빨간색. 잔액 위젯에서 어떤 카드의 잔액인지 바로 보이게 한다
+function CardThumb() {
+  return (
+    <svg width="44" height="28" viewBox="0 0 44 28" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+      <rect width="44" height="28" rx="5" fill={colors.error} />
+      <rect x="6" y="9" width="11" height="8" rx="2" fill={colors.illustration.cardChip} />
+      <rect x="6" y="21" width="18" height="2" rx="1" fill="rgba(255,255,255,0.4)" />
+    </svg>
+  )
+}
+
 export default function BalanceCardExpanded({
   chargeButtonRef,
   refundButtonRef,
@@ -56,13 +67,17 @@ export default function BalanceCardExpanded({
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'baseline',
+            alignItems: 'center',
           }}>
             <span style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: spacing[2],
               fontSize: typography.size.sm,
               color: 'rgba(255,255,255,0.7)',
               fontWeight: typography.weight.medium,
             }}>
+              <CardThumb />
               대구로페이
             </span>
             <span style={{
@@ -107,13 +122,13 @@ export default function BalanceCardExpanded({
                 <span style={{
                   fontSize: typography.size.sm,
                   fontWeight: typography.weight.bold,
-                  color: colors.teal[500],
+                  color: colors.primary[700],
                 }}>
                   {Math.round(progressPct)}%
                 </span>
               </div>
 
-              {/* 2줄: 진행바 (민트) */}
+              {/* 2줄: 진행바 (인디고) */}
               <div style={{
                 height: 6,
                 backgroundColor: colors.gray[100],
@@ -124,7 +139,7 @@ export default function BalanceCardExpanded({
                 <div style={{
                   height: '100%',
                   width: `${progressPct}%`,
-                  backgroundColor: colors.teal[500],
+                  backgroundColor: colors.primary[700],
                   transition: 'width 280ms cubic-bezier(0.23,1,0.32,1)',
                 }} />
               </div>

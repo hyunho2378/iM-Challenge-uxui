@@ -113,7 +113,7 @@ function DiscountLimitCardLarge({ monthlyDiscountCharged, sizes, fmt, btnRadius 
         <span style={{
           fontSize: sizes.xl,
           fontWeight: typography.weight.bold,
-          color: colors.teal[500],
+          color: colors.primary[700],
           fontFamily: typography.fontFamily,
         }}>
           {Math.round(progressPct)}%
@@ -131,7 +131,7 @@ function DiscountLimitCardLarge({ monthlyDiscountCharged, sizes, fmt, btnRadius 
         <div style={{
           height: '100%',
           width: `${progressPct}%`,
-          backgroundColor: colors.teal[500],
+          backgroundColor: colors.primary[700],
           transition: 'width 280ms cubic-bezier(0.23,1,0.32,1)',
         }} />
       </div>
