@@ -9,9 +9,11 @@ import { Search, X } from 'lucide-react'
 import { colors, layout, typography, spacing, shadow } from '../tokens/tokens'
 import { BANKS, SECURITIES } from '../data/bankData'
 import { useUser } from '../context/UserContext'
+import { useOnboarding } from '../context/OnboardingContext'
 
 import ScreenContainer from '../components/layout/ScreenContainer'
 import TopAppBarBack from '../components/layout/TopAppBarBack'
+import CoachMarkOverlay from '../components/common/CoachMarkOverlay'
 
 const IDLE_MS = 8000 // 8초간 선택 없으면 개입
 
@@ -82,6 +84,7 @@ function InstitutionGrid({ items, query, highlightId, onSelect }) {
 export default function AccountLinkPage() {
   const navigate = useNavigate()
   const { linkAccount } = useUser()
+  const { hasSeenAccountLinkCoach, markSeen } = useOnboarding()
   const [tab, setTab] = useState('은행')
   const [query, setQuery] = useState('')
   const [showAssist, setShowAssist] = useState(false)
@@ -89,6 +92,7 @@ export default function AccountLinkPage() {
   const [assistNotFound, setAssistNotFound] = useState(false)
   const [highlightId, setHighlightId] = useState(null)
   const idleTimerRef = useRef(null)
+  const searchBoxRef = useRef(null)
 
   // AI 개입지점 1: 일정 시간 스크롤만 하고 못 고르면 개입 배너를 띄운다.
   // 검색을 이미 쓰고 있으면(query 입력) 스스로 찾고 있는 것이므로 개입하지 않는다.
@@ -136,7 +140,7 @@ export default function AccountLinkPage() {
         </div>
 
         {/* 검색. to-be 추가: 40개 로고에서 직접 찾는 장벽을 없앤다 */}
-        <div style={{ padding: `${spacing[2]} ${layout.margin} ${spacing[3]}`, backgroundColor: colors.surface.card }}>
+        <div ref={searchBoxRef} style={{ padding: `${spacing[2]} ${layout.margin} ${spacing[3]}`, backgroundColor: colors.surface.card }}>
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -267,6 +271,18 @@ export default function AccountLinkPage() {
             </p>
           )}
         </div>
+      )}
+
+      {/* 06차 2번: 신규 화면 첫 방문 안내 — 검색으로 찾을 수 있다는 것부터 알려준다 */}
+      {!hasSeenAccountLinkCoach && (
+        <CoachMarkOverlay
+          targetRef={searchBoxRef}
+          message="은행 이름을 검색하면 바로 찾을 수 있어요."
+          step={1}
+          totalSteps={1}
+          onNext={() => markSeen('accountLink')}
+          onSkip={() => markSeen('accountLink')}
+        />
       )}
     </ScreenContainer>
   )

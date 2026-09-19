@@ -153,7 +153,9 @@ export default function PaymentAuthOverlay({ open, onComplete, onCancel }) {
         width: '100%',
         maxWidth: layout.viewport,
         backgroundColor: colors.surface.card,
-        zIndex: 1000,
+        // 07차: 코치마크(9999)가 뜬 채로 실제 결제 인증을 열면 코치마크가 이 화면을
+        // 덮어버리는 문제가 있었다(ChargeScreen/ChargeFreePage). 실거래 인증이 항상 위에 오게 한다.
+        zIndex: 10000,
         display: 'flex',
         flexDirection: 'column',
         fontFamily: typography.fontFamily,

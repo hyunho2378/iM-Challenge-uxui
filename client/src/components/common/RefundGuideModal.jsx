@@ -1,15 +1,17 @@
 // RefundGuideModal.jsx — S05 (p.18)
 // 환불 안내 모달 (충전 전)
+// 06차 4번: 이전 프로젝트 고유 규칙(충전 건별 60%/80% 사용 후 환불)을 지우고
+// iM샵 실제 규칙(전사.md FAQ Q19 원문)으로 바꿨다. RefundPage.jsx와 같은 근거다.
 
 import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
 import BottomSheet from './BottomSheet'
 import { usePlatform } from '../../hooks/usePlatform'
 
 const REFUND_CONDITIONS = [
-  '충전 잔액 기준 일정 비율 이상 사용 시 환불 가능',
-  '충전 금액 1만원 초과: 60% 이상 사용',
-  '충전 금액 1만원 이하: 80% 이상 사용',
-  '과거 월 거래는 환불 불가',
+  '마지막 충전 후 잔액을 기준으로, 잔액의 40% 이하 금액을 환불 받을 수 있습니다.',
+  '상품권 잔액 환불 시, 혜택금은 환수 처리됩니다.',
+  '상품권 잔액은 수수료 없이 연결된 계좌로 환불됩니다.',
+  '지자체 정책자금은 환불할 수 없습니다.',
 ]
 
 export default function RefundGuideModal({ isOpen, onClose }) {

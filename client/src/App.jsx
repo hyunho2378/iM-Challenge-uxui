@@ -7,6 +7,7 @@ import { UserProvider } from './context/UserContext'
 import ScreenContainer from './components/layout/ScreenContainer'
 import { colors, glass, typography } from './tokens/tokens'
 import SplashPage from './pages/SplashPage'
+import AuthGateScreen from './components/auth/AuthGateScreen'
 import HomePage from './pages/HomePage'
 import StorePage from './pages/StorePage'
 import QRPage from './pages/QRPage'
@@ -28,11 +29,14 @@ import SearchPage from './pages/SearchPage'
 import CardApplyPage from './pages/CardApplyPage'
 import CardManagementPage from './pages/CardManagementPage'
 import RefundPage from './pages/RefundPage'
+import BenefitsPage from './pages/BenefitsPage'
 import Snackbar from './components/common/Snackbar'
 import TermsPage from './pages/TermsPage'
 
 function App() {
   const [showSplash, setShowSplash] = useState(true)
+  // 07차 2번: 스플래시-홈 사이 최소 본인인증 게이트. 라우터 밖에서 렌더해 딥링크/뒤로가기에 영향 없다.
+  const [gatePassed, setGatePassed] = useState(false)
 
   useEffect(() => {
     applyPlatformClass()
@@ -57,10 +61,17 @@ function App() {
     )
   }
 
+  // AuthGateScreen은 useTypography()(→ useApp())를 쓰므로 AppProvider 안에서 렌더돼야 한다.
+  // 라우터 자체는 게이트 통과 후에만 마운트하되, 프로바이더는 게이트 단계부터 감싼다.
   return (
     <AppProvider>
       <UserProvider>
       <OnboardingProvider>
+      {!gatePassed ? (
+        <ScreenContainer statusBarBg={colors.surface.card}>
+          <AuthGateScreen onDone={() => setGatePassed(true)} onSkip={() => setGatePassed(true)} />
+        </ScreenContainer>
+      ) : (
       <BrowserRouter>
         <Routes>
           {/* 바텀탭 5개 */}
@@ -84,6 +95,7 @@ function App() {
           <Route path="/card-apply" element={<CardApplyPage />} />
           <Route path="/card-management" element={<CardManagementPage />} />
           <Route path="/refund" element={<RefundPage />} />
+          <Route path="/benefits" element={<BenefitsPage />} />
 
           {/* 메뉴/설정 */}
           <Route path="/menu" element={<Navigate to="/my" replace />} />
@@ -97,6 +109,7 @@ function App() {
         </Routes>
         <Snackbar />
       </BrowserRouter>
+      )}
       </OnboardingProvider>
       </UserProvider>
     </AppProvider>

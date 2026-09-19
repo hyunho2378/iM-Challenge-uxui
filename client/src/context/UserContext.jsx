@@ -11,6 +11,10 @@ import { useApp } from './AppContext'
 
 const UserContext = createContext(null)
 
+// 06차: iM샵 실측(전사.md S09) — 월충전한도 300,000원. 이 한도를 넘겨 충전하려 하면
+// ChargeScreen이 AI 개입(할인없이충전 유도)을 띄운다. 할인없이충전(무혜택)은 이 한도를 소비하지 않는다.
+export const MONTHLY_DISCOUNT_LIMIT = 300000
+
 // ─── 초기 상태 (카드 등록 전 = 빈 값) ─────────────────────────────────────────
 
 const EMPTY_INITIAL = {
@@ -18,6 +22,7 @@ const EMPTY_INITIAL = {
   cashbackBalance: 0,
   cashbackMode: 'auto',
   monthlyAccumulated: 0,
+  monthlyDiscountCharged: 0,
   transactions: [],
 }
 
@@ -28,19 +33,20 @@ function userReducer(state, action) {
 
     case 'LOAD_MOCK_DATA': {
       // 카드 등록 시점에 generateMockData() 결과 주입
-      const { balance, cashbackBalance, monthlyAccumulated, transactions } = action.payload
+      const { balance, cashbackBalance, monthlyAccumulated, monthlyDiscountCharged, transactions } = action.payload
       return {
         ...state,
         balance,
         cashbackBalance,
         monthlyAccumulated,
+        monthlyDiscountCharged,
         transactions,
         // cashbackMode는 유지 (기본 'auto')
       }
     }
 
     case 'CHARGE_BALANCE': {
-      const { id, amount, date } = action.payload
+      const { id, amount, date, discounted } = action.payload
       const newBalance = state.balance + amount
       const newTransaction = {
         id,
@@ -52,11 +58,15 @@ function userReducer(state, action) {
         paidByBalance: amount,
         cashbackEarned: 0,
         cashbackMode: null,
+        discounted,
         balanceAfter: newBalance,
       }
       return {
         ...state,
         balance: newBalance,
+        monthlyDiscountCharged: discounted
+          ? state.monthlyDiscountCharged + amount
+          : state.monthlyDiscountCharged,
         transactions: [newTransaction, ...state.transactions],
       }
     }
@@ -101,37 +111,28 @@ function userReducer(state, action) {
       }
     }
 
-    case 'REFUND_TRANSACTION': {
-      const { transactionId } = action.payload
-      const target = state.transactions.find((t) => t.id === transactionId)
-
-      if (!target || target.type !== 'charge') return state
-
-      const refundAmount = target.paidByBalance
-      const newBalance = state.balance + refundAmount
+    case 'REFUND_BALANCE': {
+      // 06차: iM샵 실제 규칙(전사.md FAQ Q19)은 특정 충전 건이 아니라 "현재 잔액"의
+      // 40% 이하만 환불 대상이다. 과거처럼 충전 건을 찾아 되돌리는 구조가 아니다.
+      const { id, amount, date } = action.payload
+      if (amount <= 0 || amount > state.balance) return state
+      const newBalance = state.balance - amount
       const newTransaction = {
-        id: Date.now(),
-        date: new Date().toISOString(),
+        id,
+        date,
         type: 'refund',
         storeName: null,
-        totalAmount: refundAmount,
+        totalAmount: amount,
         paidByCashback: 0,
-        paidByBalance: refundAmount,
+        paidByBalance: amount,
         cashbackEarned: 0,
         cashbackMode: null,
         balanceAfter: newBalance,
-        linkedTransactionId: transactionId,
       }
-
       return {
         ...state,
         balance: newBalance,
-        transactions: [
-          newTransaction,
-          ...state.transactions.map((t) =>
-            t.id === transactionId ? { ...t, refunded: true } : t
-          ),
-        ],
+        transactions: [newTransaction, ...state.transactions],
       }
     }
 
@@ -172,6 +173,7 @@ export function UserProvider({ children }) {
         balance: mockData.balance,
         cashbackBalance: mockData.cashbackBalance,
         monthlyAccumulated: mockData.monthlyAccumulated,
+        monthlyDiscountCharged: mockData.monthlyDiscountCharged,
         transactions: mockData.transactions,
       },
     })
@@ -179,10 +181,11 @@ export function UserProvider({ children }) {
     setCardStatus('registered')
   }, [])
 
-  const chargeBalance = useCallback((amount) => {
+  // discounted=true: 정상 충전(/charge, 월한도 300,000 소비). false: 할인없이충전(/charge-free, 한도 미소비)
+  const chargeBalance = useCallback((amount, { discounted = true } = {}) => {
     const id = `tx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
     const date = new Date().toISOString()
-    dispatch({ type: 'CHARGE_BALANCE', payload: { id, amount, date } })
+    dispatch({ type: 'CHARGE_BALANCE', payload: { id, amount, date, discounted } })
     if (sessionId) {
       logAction(sessionId, 'charge', amount).catch(() => setLastError('charge'))
     }
@@ -196,14 +199,17 @@ export function UserProvider({ children }) {
     }
   }, [sessionId])
 
-  const refundTransaction = useCallback((transactionId) => {
-    const target = state.transactions.find((t) => t.id === transactionId)
-    const refundAmount = target?.paidByBalance || 0
-    dispatch({ type: 'REFUND_TRANSACTION', payload: { transactionId } })
-    if (sessionId && refundAmount > 0) {
-      logAction(sessionId, 'refund', refundAmount).catch(() => setLastError('refund'))
+  // 06차: 잔액환불(전사.md FAQ Q19). 마지막 충전 후 잔액의 40% 이하만 대상 — 상한 계산은
+  // 호출부(RefundPage)에서 하고, 여기는 금액을 받아 그대로 차감한다.
+  const refundBalance = useCallback((amount) => {
+    const id = `tx_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+    const date = new Date().toISOString()
+    dispatch({ type: 'REFUND_BALANCE', payload: { id, amount, date } })
+    if (sessionId && amount > 0) {
+      logAction(sessionId, 'refund', amount).catch(() => setLastError('refund'))
     }
-  }, [sessionId, state.transactions])
+    return id
+  }, [sessionId])
 
   // 서버 기록 실패를 더 이상 조용히 버리지 않는다.
   // 지금은 상태만 남긴다. 사용자에게 보여줄 실패 화면은 캡처 확보 후 설계한다.
@@ -221,6 +227,7 @@ export function UserProvider({ children }) {
       cashbackBalance: state.cashbackBalance,
       cashbackMode: state.cashbackMode,
       monthlyAccumulated: state.monthlyAccumulated,
+      monthlyDiscountCharged: state.monthlyDiscountCharged,
       transactions: state.transactions,
       applyCard,
       shipCard,
@@ -229,7 +236,7 @@ export function UserProvider({ children }) {
       linkAccount,
       chargeBalance,
       spendBalance,
-      refundTransaction,
+      refundBalance,
       setCashbackMode,
       lastError,
       clearError,

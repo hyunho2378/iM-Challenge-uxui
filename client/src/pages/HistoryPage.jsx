@@ -7,14 +7,13 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Calendar, ChevronDown, Receipt } from 'lucide-react'
+import { Receipt } from 'lucide-react'
 import { useUser } from '../context/UserContext'
 import { colors, typography, layout, spacing } from '../tokens/tokens'
 import { formatDate } from '../utils/date'
 import { useTypography } from '../hooks/useTypography'
 import ScreenContainer from '../components/layout/ScreenContainer'
 import BottomNavBar from '../components/layout/BottomNavBar'
-import PeriodPickerModal from '../components/common/PeriodPickerModal'
 import Button from '../components/common/Button'
 
 const TYPE_FILTERS = [
@@ -24,13 +23,19 @@ const TYPE_FILTERS = [
   { key: 'spend', label: '결제' },
 ]
 
+// 06차 3번: 월별 칩 필터. mock 데이터가 2025-06~2026-05(iM샵 "이번 달" 기준)를 다루므로
+// 그 12개월을 최신순으로 나열한다. PeriodPickerModal과 같은 앵커(2026년 5월)를 쓴다.
+const MONTH_OPTIONS = Array.from({ length: 12 }, (_, i) => {
+  const d = new Date(2026, 4 - i)
+  return { year: d.getFullYear(), month: d.getMonth() + 1 }
+})
+
 export default function HistoryPage() {
   const navigate = useNavigate()
   const sizes = useTypography()
   const { hasCard, transactions } = useUser()
 
   const [typeFilter, setTypeFilter] = useState('all')
-  const [periodOpen, setPeriodOpen] = useState(false)
   const [periodFilter, setPeriodFilter] = useState(null)
 
   // 카드 미신청 시 빈 상태 — BottomNav 진입 가능 페이지라 카드 미신청 사용자도 도달 가능
@@ -127,10 +132,6 @@ export default function HistoryPage() {
   const fmt = (n) => n.toLocaleString('ko-KR')
   const fmtDate = (iso) => formatDate(iso, { withTime: true })
 
-  const periodLabel = periodFilter
-    ? `${periodFilter.year}년 ${periodFilter.month}월`
-    : '전체 기간'
-
   return (
     <ScreenContainer statusBarBg={colors.surface.card}>
       {/* 헤더 */}
@@ -186,34 +187,52 @@ export default function HistoryPage() {
           })}
         </div>
 
-        {/* 기간 필터 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: spacing[2] }}>
+        {/* 06차 3번: 월별 칩 필터 — 모달 대신 가로 스크롤 칩으로 바로 고른다 */}
+        <div style={{ display: 'flex', gap: spacing[2], overflowX: 'auto', scrollbarWidth: 'none' }}>
           <button
-            onClick={() => setPeriodOpen(true)}
+            onClick={() => setPeriodFilter(null)}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: spacing[1],
+              flexShrink: 0,
               padding: `${spacing[1]} ${spacing[3]}`,
               borderRadius: layout.radiusPill,
-              border: `1px solid ${periodFilter ? colors.primary[700] : colors.gray[200]}`,
-              backgroundColor: periodFilter ? colors.primary[50] : 'transparent',
+              border: `1px solid ${!periodFilter ? colors.primary[700] : colors.gray[200]}`,
+              backgroundColor: !periodFilter ? colors.primary[700] : 'transparent',
+              color: !periodFilter ? colors.onDark.primary : colors.gray[700],
+              fontSize: sizes.xs,
+              fontWeight: !periodFilter ? typography.weight.semibold : typography.weight.regular,
               cursor: 'pointer',
               fontFamily: typography.fontFamily,
               minHeight: '32px',
+              whiteSpace: 'nowrap',
             }}
           >
-            <Calendar size={14} color={periodFilter ? colors.primary[700] : colors.gray[500]} />
-            <span style={{
-              fontSize: sizes.xs,
-              fontWeight: periodFilter ? typography.weight.semibold : typography.weight.regular,
-              color: periodFilter ? colors.primary[700] : colors.gray[700],
-            }}>
-              {periodLabel}
-            </span>
-            <ChevronDown size={14} color={periodFilter ? colors.primary[700] : colors.gray[400]} />
+            전체 기간
           </button>
-
+          {MONTH_OPTIONS.map(({ year, month }) => {
+            const active = periodFilter?.year === year && periodFilter?.month === month
+            return (
+              <button
+                key={`${year}-${month}`}
+                onClick={() => setPeriodFilter({ year, month })}
+                style={{
+                  flexShrink: 0,
+                  padding: `${spacing[1]} ${spacing[3]}`,
+                  borderRadius: layout.radiusPill,
+                  border: `1px solid ${active ? colors.primary[700] : colors.gray[200]}`,
+                  backgroundColor: active ? colors.primary[700] : 'transparent',
+                  color: active ? colors.onDark.primary : colors.gray[700],
+                  fontSize: sizes.xs,
+                  fontWeight: active ? typography.weight.semibold : typography.weight.regular,
+                  cursor: 'pointer',
+                  fontFamily: typography.fontFamily,
+                  minHeight: '32px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {year}년 {month}월
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -328,7 +347,7 @@ export default function HistoryPage() {
                         fontSize: sizes.xs,
                         color: colors.gray[700],
                       }}>
-                        <span>캐시백 사용</span>
+                        <span>혜택 사용</span>
                         <span style={{
                           color: colors.teal[500],
                           fontWeight: typography.weight.medium,
@@ -367,15 +386,6 @@ export default function HistoryPage() {
       </div>
 
       <BottomNavBar />
-
-      <PeriodPickerModal
-        open={periodOpen}
-        onClose={() => setPeriodOpen(false)}
-        onSelect={(y, m) => setPeriodFilter(y === null ? null : { year: y, month: m })}
-        selectedYear={periodFilter?.year ?? null}
-        selectedMonth={periodFilter?.month ?? null}
-        showAll
-      />
     </ScreenContainer>
   )
 }

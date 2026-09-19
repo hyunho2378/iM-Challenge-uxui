@@ -49,6 +49,7 @@ export default function MyPage() {
           : { label: '카드 배송 현황', disabled: true, labelColor: colors.gray[900], value: '배송 중', valueColor: colors.gray[400] },
         { label: '주 카드 변경' },
         { label: '분실신고 / 재발급', href: '/card-lost' },
+        { label: '혜택 현황', href: '/benefits' },
       ],
     },
     {

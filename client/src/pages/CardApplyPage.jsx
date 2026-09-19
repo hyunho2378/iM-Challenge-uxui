@@ -10,14 +10,16 @@
  * B5: 한 화면 레이아웃 최적화
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
+import { useOnboarding } from '../context/OnboardingContext'
 import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react'
 import { colors, typography, layout, spacing, shadow } from '../tokens/tokens'
 import { useTypography } from '../hooks/useTypography'
 import ScreenContainer from '../components/layout/ScreenContainer'
 import Button from '../components/common/Button'
+import CoachMarkOverlay from '../components/common/CoachMarkOverlay'
 
 // B1: 140×88 축소 (viewBox 좌표계 220×138 유지)
 function CardSVG({ type }) {
@@ -185,7 +187,12 @@ export default function CardApplyPage() {
   const navigate = useNavigate()
   const sizes = useTypography()
   const { cardStatus, applyCard, shipCard, registerCard } = useUser()
+  const { hasSeenCardApplyFlowCoach, markSeen } = useOnboarding()
   const BENEFITS = getBenefits(sizes)
+  // 06차 2번: 처음 보는 사용자에게 단계별로 뭘 눌러야 할지 짚어준다
+  const applyBtnRef = useRef(null)
+  const registerBtnRef = useRef(null)
+  const [step1Dismissed, setStep1Dismissed] = useState(false)
 
   useEffect(() => {
     if (cardStatus === 'applying') {
@@ -277,6 +284,25 @@ export default function CardApplyPage() {
                   }}
                 />
               </div>
+
+              {/* 07차: 불편사례 정리 #3·#16·#21·#23 — 카드는 받았는데 결제 방법을 몰라 못 쓰는 문제.
+                  새 화면 없이 이 완료 화면에 카드 형태로 결제 방법 두 가지만 짧게 안내한다. */}
+              <div style={{
+                margin: `0 ${layout.margin}`,
+                padding: spacing[4],
+                backgroundColor: colors.primary[50],
+                borderRadius: layout.radiusCard,
+              }}>
+                <p style={{ margin: `0 0 ${spacing[3]}`, fontSize: sizes.sm, fontWeight: typography.weight.semibold, color: colors.primary[700] }}>
+                  이 카드로 결제하는 방법
+                </p>
+                <p style={{ margin: `0 0 ${spacing[2]}`, fontSize: sizes.xs, color: colors.gray[700], lineHeight: typography.lineHeight.body }}>
+                  <b>QR결제</b> — 가맹점의 QR코드를 스캔하면 바로 결제할 수 있어요.
+                </p>
+                <p style={{ margin: 0, fontSize: sizes.xs, color: colors.gray[700], lineHeight: typography.lineHeight.body }}>
+                  <b>삼성페이 등록</b> — 삼성페이 앱에 이 카드를 등록하면 QR코드가 없는 가맹점에서도 결제할 수 있어요.
+                </p>
+              </div>
             </div>
 
             <div style={{ flex: 1 }} />
@@ -287,16 +313,30 @@ export default function CardApplyPage() {
               padding: `${spacing[3]} ${layout.margin}`,
               paddingBottom: `calc(env(safe-area-inset-bottom) + ${spacing[3]})`,
             }}>
-              <Button
-                variant="filled"
-                size="lg"
-                onClick={() => { registerCard(); navigate('/') }}
-              >
-                카드 등록하기
-              </Button>
+              {/* Button은 forwardRef가 아니라 div로 감싸 코치마크 대상 좌표를 잡는다 */}
+              <div ref={registerBtnRef}>
+                <Button
+                  variant="filled"
+                  size="lg"
+                  onClick={() => { registerCard(); navigate('/') }}
+                >
+                  카드 등록하기
+                </Button>
+              </div>
             </div>
           </div>
         </div>
+
+        {!hasSeenCardApplyFlowCoach && (
+          <CoachMarkOverlay
+            targetRef={registerBtnRef}
+            message="카드 번호를 입력하고 카드 등록하기를 누르면 등록이 끝나요."
+            step={2}
+            totalSteps={2}
+            onNext={() => markSeen('cardApplyFlow')}
+            onSkip={() => markSeen('cardApplyFlow')}
+          />
+        )}
       </ScreenContainer>
     )
   }
@@ -656,15 +696,29 @@ export default function CardApplyPage() {
           padding: `${spacing[3]} ${layout.margin}`,
           paddingBottom: `calc(env(safe-area-inset-bottom) + ${spacing[3]})`,
         }}>
-          <Button
-            variant="filled"
-            size="lg"
-            onClick={applyCard}
-          >
-            간편 신청하기
-          </Button>
+          {/* Button은 forwardRef가 아니라 div로 감싸 코치마크 대상 좌표를 잡는다 */}
+          <div ref={applyBtnRef}>
+            <Button
+              variant="filled"
+              size="lg"
+              onClick={applyCard}
+            >
+              간편 신청하기
+            </Button>
+          </div>
         </div>
       </div>
+
+      {!hasSeenCardApplyFlowCoach && !step1Dismissed && (
+        <CoachMarkOverlay
+          targetRef={applyBtnRef}
+          message="카드를 고르고 간편 신청하기를 눌러주세요."
+          step={1}
+          totalSteps={2}
+          onNext={() => setStep1Dismissed(true)}
+          onSkip={() => markSeen('cardApplyFlow')}
+        />
+      )}
     </ScreenContainer>
   )
 }

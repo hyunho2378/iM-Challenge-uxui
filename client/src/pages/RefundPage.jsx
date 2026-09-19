@@ -1,72 +1,71 @@
 /**
- * RefundPage (C5)
- * 충전 내역 리스트 → 항목 선택 → 확인 다이얼로그 → refundTransaction(id)
- * Strategy: S2 — 환불 동등 위계
- * Nielsen: #1 visibility, #3 user control
+ * RefundPage — 잔액환불 (06차 4번, 재작성)
+ * 이전 버전은 이전 프로젝트 고유 규칙(충전 건별 60%/80% 사용 후 환불)을 그대로 쓰고 있었다.
+ * iM샵 실제 규칙(전사.md FAQ Q19)은 특정 충전 건이 아니라 "현재 잔액"의 40% 이하만 환불
+ * 대상이라, 구조 자체를 잔액 기준 환불 신청 폼으로 다시 짰다.
+ * 인용 문구는 FAQ Q19 원문 그대로다(data/faqData.js FAQ_ITEMS.대구로페이[18]).
  */
 
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { ChevronLeft } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { useUser } from '../context/UserContext'
 import { useApp } from '../context/AppContext'
-import { formatDate } from '../utils/date'
 import { colors, typography, layout, spacing, shadow } from '../tokens/tokens'
 import { useTypography } from '../hooks/useTypography'
-import { usePlatform } from '../hooks/usePlatform'
 import ScreenContainer from '../components/layout/ScreenContainer'
 import BottomNavBar from '../components/layout/BottomNavBar'
+import NumPad from '../components/payment/NumPad'
 import PaymentAuthOverlay from '../components/common/PaymentAuthOverlay'
 import Button from '../components/common/Button'
+
+// FAQ Q19 원문 그대로. 지자체 정책자금 제외는 이 앱 데이터 모델에 별도 항목이 없어
+// 실제로 걸러내지는 못한다 — 안내 문구로만 노출한다(자체점검 보고에 명시).
+const REFUND_RULE_NOTES = [
+  '상품권 잔액 환불 시, 혜택금은 환수 처리됩니다.',
+  '상품권 잔액은 수수료 없이 연결된 계좌로 환불됩니다.',
+  '지자체 정책자금은 환불할 수 없습니다.',
+]
 
 export default function RefundPage() {
   const navigate = useNavigate()
   const sizes = useTypography()
-  const { transactions, balance, refundTransaction } = useUser()
+  const { balance, refundBalance } = useUser()
   const { isLargeText, showSnackbar } = useApp()
-  const isAndroid = usePlatform() === 'android'
-  const [confirmId, setConfirmId] = useState(null)
+  const [amount, setAmount] = useState(0)
+  const [confirming, setConfirming] = useState(false)
   const [showAuth, setShowAuth] = useState(false)
 
-  // 큰글씨 모드: 본문/statusBar 회색 (surface.background)
-  // 일반 모드: 흰색 (surface.card)
   const bodyBg = isLargeText ? colors.surface.background : colors.surface.card
-
-  const chargeList = transactions.filter((t) => t.type === 'charge')
-
-  const grouped = chargeList.reduce((acc, t) => {
-    const d = new Date(t.date)
-    const key = `${d.getFullYear()}년 ${d.getMonth() + 1}월`
-    if (!acc[key]) acc[key] = []
-    acc[key].push(t)
-    return acc
-  }, {})
-
   const fmt = (n) => n.toLocaleString('ko-KR') + '원'
-  const fmtDate = (iso) => formatDate(iso, { withTime: true })
 
-  const handleRefund = (id) => {
-    const tx = chargeList.find((t) => t.id === id)
-    refundTransaction(id)
-    if (tx) showSnackbar(`${tx.totalAmount.toLocaleString('ko-KR')}원 환불이 완료됐어요`)
-    setConfirmId(null)
+  // iM샵 실제 규칙: 마지막 충전 후 잔액의 40% 이하만 환불 대상
+  const maxRefundable = Math.floor(balance * 0.4)
+  const hasAmount = amount > 0
+  const isOverLimit = amount > maxRefundable
+  const canRequest = hasAmount && !isOverLimit
+
+  const handleNumPress = (key) => {
+    if (key === 'backspace') {
+      setAmount((prev) => {
+        const str = String(prev)
+        return str.length <= 1 ? 0 : parseInt(str.slice(0, -1), 10)
+      })
+      return
+    }
+    setAmount((prev) => {
+      const str = prev === 0 ? '' : String(prev)
+      const parsed = parseInt(str + key, 10)
+      if (isNaN(parsed) || parsed > maxRefundable) return prev
+      return parsed
+    })
   }
 
-  const confirmTarget = chargeList.find((t) => t.id === confirmId)
-
-  const isRefundable = (chargeTx) => {
-    if (chargeTx.refunded) return { ok: false, reason: '이미 환불됨' }
-    if (balance <= 0) return { ok: false, reason: '잔액이 없습니다' }
-    if (chargeTx.totalAmount > balance) return { ok: false, reason: '잔액 부족' }
-    const chargeDate = new Date(chargeTx.date).getTime()
-    const spentAfter = transactions
-      .filter((t) => t.type === 'spend' && new Date(t.date).getTime() >= chargeDate)
-      .reduce((sum, t) => sum + t.totalAmount, 0)
-    const requiredRatio = chargeTx.totalAmount > 10000 ? 0.6 : 0.8
-    if (spentAfter / chargeTx.totalAmount < requiredRatio) {
-      return { ok: false, reason: `${Math.floor(requiredRatio * 100)}% 이상 사용 후 환불 가능` }
-    }
-    return { ok: true }
+  const handleConfirmed = () => {
+    refundBalance(amount)
+    showSnackbar(`${fmt(amount)} 환불이 완료됐어요`)
+    setConfirming(false)
+    setAmount(0)
   }
 
   return (
@@ -86,14 +85,9 @@ export default function RefundPage() {
           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           aria-label="뒤로가기"
         >
-          <ChevronLeft size={24} color={colors.gray[900]} />
+          <ArrowLeft size={24} color={colors.gray[900]} />
         </button>
-        <h1 style={{
-          margin: 0,
-          fontSize: sizes.lg,
-          fontWeight: typography.weight.bold,
-          color: colors.gray[900],
-        }}>
+        <h1 style={{ margin: 0, fontSize: sizes.lg, fontWeight: typography.weight.bold, color: colors.gray[900] }}>
           환불
         </h1>
       </div>
@@ -104,22 +98,18 @@ export default function RefundPage() {
           backgroundColor: colors.surface.darkCard,
           borderRadius: layout.radiusCard,
           padding: spacing[5],
-          marginBottom: spacing[5],
+          marginBottom: spacing[4],
           boxShadow: shadow.button,
         }}>
           <p style={{ margin: 0, color: colors.onDark.secondary, fontSize: sizes.xs }}>
             현재 잔액
           </p>
-          <p style={{
-            margin: `${spacing[1]} 0 0 0`,
-            color: colors.onDark.primary,
-            fontSize: sizes.largeTitle,
-            fontWeight: typography.weight.bold,
-          }}>
+          <p style={{ margin: `${spacing[1]} 0 0 0`, color: colors.onDark.primary, fontSize: sizes.largeTitle, fontWeight: typography.weight.bold }}>
             {fmt(balance)}
           </p>
         </div>
 
+        {/* 실제 FAQ 인용 — 전사.md FAQ Q19 원문 */}
         <div style={{
           marginBottom: spacing[4],
           padding: spacing[4],
@@ -127,32 +117,21 @@ export default function RefundPage() {
           borderRadius: layout.radiusCard,
           fontSize: sizes.xs,
           color: colors.gray[700],
-          lineHeight: 1.6,
+          lineHeight: typography.lineHeight.body,
         }}>
           <p style={{ fontWeight: typography.weight.semibold, margin: `0 0 ${spacing[2]} 0`, color: colors.primary[700] }}>
-            환불 가능 조건
+            환불 가능 조건 (고객센터 안내 원문)
           </p>
-          <p style={{ margin: `0 0 ${spacing[1]} 0` }}>• 충전 잔액 기준 일정 비율 이상 사용 시 환불 가능</p>
-          <p style={{ margin: `0 0 ${spacing[1]} 0` }}>• 충전 금액 1만원 초과: 60% 이상 사용</p>
-          <p style={{ margin: 0 }}>• 충전 금액 1만원 이하: 80% 이상 사용</p>
+          <p style={{ margin: `0 0 ${spacing[3]} 0` }}>
+            마지막 충전 후 잔액을 기준으로, 잔액의 40% 이하 금액을 iM샵 앱 또는 영업점에서 환불 받을 수 있습니다.
+          </p>
+          {REFUND_RULE_NOTES.map((note) => (
+            <p key={note} style={{ margin: `0 0 ${spacing[1]} 0` }}>※ {note}</p>
+          ))}
         </div>
 
-        <h2 style={{
-          margin: `0 0 ${spacing[3]} 0`,
-          fontSize: sizes.md,
-          fontWeight: typography.weight.semibold,
-          color: colors.gray[900],
-        }}>
-          충전 내역
-        </h2>
-
         {balance === 0 ? (
-          <div style={{
-            backgroundColor: colors.surface.card,
-            borderRadius: layout.radiusCard,
-            padding: spacing[8],
-            textAlign: 'center',
-          }}>
+          <div style={{ backgroundColor: colors.surface.card, borderRadius: layout.radiusCard, padding: spacing[8], textAlign: 'center' }}>
             <p style={{ color: colors.gray[700], fontWeight: typography.weight.semibold, margin: `0 0 ${spacing[2]} 0` }}>
               환불할 잔액이 없습니다
             </p>
@@ -161,151 +140,110 @@ export default function RefundPage() {
             </p>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing[3] }}>
-            {Object.entries(grouped).map(([monthKey, items]) => (
-              <div key={monthKey}>
-                <div style={{
-                  fontSize: sizes.xs,
-                  fontWeight: typography.weight.semibold,
+          <>
+            {/* 환불 가능 금액 — 조건 충족 여부를 바로 보여준다 */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: `${spacing[4]} ${layout.margin}`,
+              backgroundColor: colors.surface.card,
+              borderRadius: layout.radiusCard,
+              marginBottom: spacing[2],
+            }}>
+              <span style={{ fontSize: sizes.sm, color: colors.gray[700] }}>환불 가능 금액 (잔액의 40%)</span>
+              <span style={{ fontSize: sizes.md, fontWeight: typography.weight.bold, color: colors.primary[700] }}>
+                최대 {fmt(maxRefundable)}
+              </span>
+            </div>
+
+            {/* 금액 표시 */}
+            <div style={{ backgroundColor: colors.surface.card, padding: `${spacing[4]} ${layout.margin}`, textAlign: 'center', borderRadius: layout.radiusCard, marginBottom: spacing[2] }}>
+              <p style={{
+                margin: 0,
+                fontSize: sizes.balanceLarge,
+                fontWeight: typography.weight.bold,
+                color: hasAmount ? colors.gray[900] : colors.gray[400],
+              }}>
+                {hasAmount ? fmt(amount) : '0원'}
+              </p>
+              {isOverLimit && (
+                <p style={{ margin: `${spacing[2]} 0 0`, fontSize: sizes.xs, color: colors.error }}>
+                  환불 가능 금액을 넘었어요
+                </p>
+              )}
+            </div>
+
+            <div style={{ padding: `${spacing[2]} 0 ${spacing[3]}` }}>
+              <button
+                onClick={() => setAmount(maxRefundable)}
+                style={{
+                  width: '100%',
+                  minHeight: layout.touchMin,
+                  background: 'none',
+                  border: `1px solid ${colors.gray[200]}`,
+                  borderRadius: layout.radiusButton,
                   color: colors.gray[700],
-                  paddingBottom: spacing[2],
-                }}>
-                  {monthKey}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: spacing[2] }}>
-                  {items.map((t) => {
-                    const result = isRefundable(t)
-                    return (
-                    <div key={t.id} style={{
-                      backgroundColor: colors.surface.card,
-                      borderRadius: layout.radiusCard,
-                      padding: spacing[4],
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: spacing[3],
-                    }}>
-                      <div>
-                        <p style={{ margin: 0, fontSize: sizes.sm, fontWeight: typography.weight.semibold, color: colors.gray[900] }}>
-                          충전
-                        </p>
-                        <p style={{ margin: `${spacing[1]} 0 0 0`, fontSize: sizes.xs, color: colors.gray[500] }}>
-                          {fmtDate(t.date)}
-                        </p>
-                        <p style={{ margin: `${spacing[1]} 0 0 0`, fontSize: sizes.md, fontWeight: typography.weight.semibold, color: colors.gray[900] }}>
-                          {fmt(t.totalAmount)}
-                        </p>
-                      </div>
-                      {result.ok ? (
-                        <button
-                          onClick={() => setConfirmId(t.id)}
-                          style={{
-                            backgroundColor: 'transparent',
-                            border: `1px solid ${colors.primary[700]}`,
-                            color: colors.primary[700],
-                            borderRadius: isAndroid ? layout.radiusPill : layout.radiusButton,
-                            padding: `${spacing[2]} ${spacing[4]}`,
-                            fontSize: sizes.sm,
-                            fontWeight: typography.weight.semibold,
-                            cursor: 'pointer',
-                            minHeight: layout.touchMin,
-                            fontFamily: typography.fontFamily,
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          환불
-                        </button>
-                      ) : (
-                        <span style={{
-                          fontSize: sizes.xs,
-                          color: colors.gray[400],
-                          whiteSpace: 'nowrap',
-                          textAlign: 'right',
-                          lineHeight: typography.lineHeight.normal,
-                        }}>
-                          {result.reason}
-                        </span>
-                      )}
-                    </div>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
+                  fontSize: sizes.sm,
+                  cursor: 'pointer',
+                }}
+              >
+                환불 가능 전액 신청 ({fmt(maxRefundable)})
+              </button>
+            </div>
+
+            <NumPad onPress={handleNumPress} />
+          </>
         )}
       </div>
 
+      {balance > 0 && (
+        <div style={{
+          padding: `${spacing[3]} ${layout.margin}`,
+          paddingBottom: `calc(env(safe-area-inset-bottom) + ${spacing[3]})`,
+          backgroundColor: colors.surface.card,
+          borderTop: `1px solid ${colors.gray[100]}`,
+        }}>
+          <Button variant="filled" size="lg" disabled={!canRequest} onClick={() => setConfirming(true)}>
+            환불 신청
+          </Button>
+        </div>
+      )}
+
       {/* 환불 확인 바텀 시트 */}
-      {confirmTarget && (
+      {confirming && (
         <>
-          {/* 딤드 — 뷰포트 전체 */}
           <div
-            onClick={() => setConfirmId(null)}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              zIndex: 200,
-            }}
+            onClick={() => setConfirming(false)}
+            className="glass-scrim"
+            style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 200 }}
           />
-          {/* 시트 — 390px 제한 + 중앙 정렬 */}
-          <div
-            style={{
-              position: 'fixed',
-              left: '50%',
-              bottom: 0,
-              transform: 'translateX(-50%)',
-              width: '100%',
-              maxWidth: layout.viewport,
-              backgroundColor: colors.surface.card,
-              borderTopLeftRadius: layout.radiusModal,
-              borderTopRightRadius: layout.radiusModal,
-              padding: `${spacing[5]} ${spacing[5]} 0`,
-              paddingBottom: `calc(${spacing[6]} + env(safe-area-inset-bottom))`,
-              fontFamily: typography.fontFamily,
-              zIndex: 201,
-            }}
-          >
-            {/* 핸들 바 */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              marginBottom: spacing[5],
-            }}>
-              <div style={{
-                width: '40px',
-                height: '4px',
-                borderRadius: layout.radiusPill,
-                backgroundColor: colors.gray[300],
-              }} />
+          <div style={{
+            position: 'fixed',
+            left: '50%',
+            bottom: 0,
+            transform: 'translateX(-50%)',
+            width: '100%',
+            maxWidth: layout.viewport,
+            backgroundColor: colors.surface.card,
+            borderTopLeftRadius: layout.radiusModal,
+            borderTopRightRadius: layout.radiusModal,
+            padding: `${spacing[5]} ${spacing[5]} 0`,
+            paddingBottom: `calc(${spacing[6]} + env(safe-area-inset-bottom))`,
+            fontFamily: typography.fontFamily,
+            zIndex: 201,
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: spacing[5] }}>
+              <div style={{ width: '40px', height: '4px', borderRadius: layout.radiusPill, backgroundColor: colors.gray[300] }} />
             </div>
 
-            {/* 타이틀 */}
-            <h3 style={{
-              margin: `0 0 ${spacing[2]}`,
-              fontSize: sizes.lg,
-              fontWeight: typography.weight.bold,
-              color: colors.gray[900],
-              textAlign: 'center',
-              lineHeight: 1.4,
-            }}>
-              iM샵 계좌로<br />
-              {fmt(confirmTarget.totalAmount)} 환불하시겠어요?
+            <h3 style={{ margin: `0 0 ${spacing[2]}`, fontSize: sizes.lg, fontWeight: typography.weight.bold, color: colors.gray[900], textAlign: 'center', lineHeight: 1.4 }}>
+              연결계좌로<br />{fmt(amount)} 환불하시겠어요?
             </h3>
-
-            {/* 서브 텍스트 */}
-            <p style={{
-              margin: `0 0 ${spacing[5]}`,
-              fontSize: sizes.sm,
-              color: colors.gray[500],
-              textAlign: 'center',
-              lineHeight: 1.5,
-            }}>
-              7일 이내 충전한 미사용 금액은 수수료 없이 환불할 수 있어요.
+            <p style={{ margin: `0 0 ${spacing[5]}`, fontSize: sizes.sm, color: colors.gray[500], textAlign: 'center', lineHeight: 1.5 }}>
+              상품권 잔액은 수수료 없이 환불돼요. 혜택금은 환수 처리됩니다.
             </p>
 
-            {/* 최종 환불 금액 박스 */}
             <div style={{
               backgroundColor: colors.surface.background,
               borderRadius: layout.radiusCard,
@@ -315,56 +253,28 @@ export default function RefundPage() {
               alignItems: 'center',
               marginBottom: spacing[4],
             }}>
-              <span style={{ fontSize: sizes.sm, color: colors.gray[700] }}>
-                최종 환불 금액
-              </span>
-              <span style={{
-                fontSize: sizes.md,
-                fontWeight: typography.weight.bold,
-                color: colors.gray[900],
-              }}>
-                {fmt(confirmTarget.totalAmount)}
-              </span>
+              <span style={{ fontSize: sizes.sm, color: colors.gray[700] }}>환불 금액</span>
+              <span style={{ fontSize: sizes.md, fontWeight: typography.weight.bold, color: colors.gray[900] }}>{fmt(amount)}</span>
             </div>
 
-            {/* 경고 메시지 */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: spacing[2],
-              marginBottom: spacing[5],
-            }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: spacing[2], marginBottom: spacing[5] }}>
               <div style={{
-                width: '16px',
-                height: '16px',
-                borderRadius: '50%',
-                backgroundColor: colors.error,
-                color: colors.onDark.primary,
-                fontSize: '11px',
-                fontWeight: typography.weight.bold,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
+                width: '16px', height: '16px', borderRadius: '50%', backgroundColor: colors.error,
+                color: colors.onDark.primary, fontSize: '11px', fontWeight: typography.weight.bold,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
                 !
               </div>
-              <span style={{
-                fontSize: sizes.xs,
-                color: colors.error,
-              }}>
-                신청 후에는 취소할 수 없습니다.
-              </span>
+              <span style={{ fontSize: sizes.xs, color: colors.error }}>신청 후에는 취소할 수 없습니다.</span>
             </div>
 
-            {/* 버튼 2개 */}
             <div style={{ display: 'flex', gap: spacing[2] }}>
               <Button
                 variant="text"
                 size="lg"
                 fullWidth={false}
                 style={{ flex: 1, backgroundColor: colors.gray[100], color: colors.gray[700] }}
-                onClick={() => setConfirmId(null)}
+                onClick={() => setConfirming(false)}
               >
                 다음에 하기
               </Button>
@@ -388,7 +298,7 @@ export default function RefundPage() {
         open={showAuth}
         onComplete={() => {
           setShowAuth(false)
-          if (confirmTarget) handleRefund(confirmTarget.id)
+          handleConfirmed()
         }}
         onCancel={() => setShowAuth(false)}
       />

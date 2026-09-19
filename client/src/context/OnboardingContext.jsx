@@ -13,12 +13,21 @@ export function OnboardingProvider({ children }) {
   const [hasSeenChargeCoach, setHasSeenChargeCoach] = useState(false)
   const [hasSeenRefundCoach, setHasSeenRefundCoach] = useState(false)
   const [hasSeenCashbackModal, setHasSeenCashbackModal] = useState(false)
+  // 06차 2번: 카드신청/충전 플로우 내부, 신규 화면(연결계좌·할인없이충전) 단계별 코치마크
+  const [hasSeenCardApplyFlowCoach, setHasSeenCardApplyFlowCoach] = useState(false)
+  const [hasSeenChargeFlowCoach, setHasSeenChargeFlowCoach] = useState(false)
+  const [hasSeenAccountLinkCoach, setHasSeenAccountLinkCoach] = useState(false)
+  const [hasSeenChargeFreeCoach, setHasSeenChargeFreeCoach] = useState(false)
 
   const markSeen = useCallback((key) => {
     if (key === 'cardApply') setHasSeenCardApplyCoach(true)
     else if (key === 'charge') setHasSeenChargeCoach(true)
     else if (key === 'refund') setHasSeenRefundCoach(true)
     else if (key === 'cashbackModal') setHasSeenCashbackModal(true)
+    else if (key === 'cardApplyFlow') setHasSeenCardApplyFlowCoach(true)
+    else if (key === 'chargeFlow') setHasSeenChargeFlowCoach(true)
+    else if (key === 'accountLink') setHasSeenAccountLinkCoach(true)
+    else if (key === 'chargeFree') setHasSeenChargeFreeCoach(true)
   }, [])
 
   const completeAllCoachmarks = useCallback(() => {
@@ -30,6 +39,7 @@ export function OnboardingProvider({ children }) {
   return (
     <OnboardingContext.Provider value={{
       hasSeenCardApplyCoach, hasSeenChargeCoach, hasSeenRefundCoach, hasSeenCashbackModal,
+      hasSeenCardApplyFlowCoach, hasSeenChargeFlowCoach, hasSeenAccountLinkCoach, hasSeenChargeFreeCoach,
       markSeen, completeAllCoachmarks,
     }}>
       {children}

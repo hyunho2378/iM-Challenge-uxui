@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom'
-import { useUser } from '../context/UserContext'
+import { useUser, MONTHLY_DISCOUNT_LIMIT } from '../context/UserContext'
 import { useTypography } from '../hooks/useTypography'
 import { usePlatform } from '../hooks/usePlatform'
 import { colors, spacing, layout, shadow, typography } from '../tokens/tokens'
 import ScreenContainer from '../components/layout/ScreenContainer'
 import BottomNavBar from '../components/layout/BottomNavBar'
 import TopAppBarLargeText from '../components/layout/TopAppBarLargeText'
-import { ChevronRight, Receipt, HelpCircle, Check } from 'lucide-react'
+import { ChevronRight, Receipt, HelpCircle } from 'lucide-react'
 
 // 잔액 카드 (다크) — iM샵 + balance + [충전(흰)][QR결제(글래스)]
 function BalanceCardLarge({ balance, sizes, navigate, fmt, btnRadius }) {
@@ -84,28 +84,10 @@ function BalanceCardLarge({ balance, sizes, navigate, fmt, btnRadius }) {
   )
 }
 
-// 캐시백 카드 (흰) — 캐시백 + cashbackBalance(teal) + [자동][수동] 토글 (대비 강화)
-// 큰글씨 모드의 토글이 일반 모드(BalanceCardExpanded)보다 강조도 높음.
-// 의도: 시니어 가독성 + 정보 밀도 다운 원칙. LARGETEXT.md 5절 참조.
-function CashbackToggleCardLarge({ cashbackBalance, cashbackMode, setCashbackMode, sizes, fmt, btnRadius }) {
-  const toggleBtn = (active) => ({
-    flex: 1,
-    height: '68px',
-    backgroundColor: active ? colors.primary[700] : colors.surface.card,
-    color: active ? colors.onDark.primary : colors.gray[500],
-    border: `2px solid ${active ? colors.primary[700] : colors.gray[200]}`,
-    borderRadius: btnRadius,
-    fontSize: sizes.md,
-    fontWeight: typography.weight.bold,
-    cursor: 'pointer',
-    fontFamily: typography.fontFamily,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing[1],
-    transition: 'background-color 200ms ease-out, border-color 200ms ease-out, color 200ms ease-out',
-  })
-
+// 06차 1번: 캐시백 자동/수동 토글 → 이번 달 할인충전 한도 진행률로 교체 (일반 모드와 동일 개념).
+// 큰글씨 모드도 같은 정보를 보여줘야 한다 — 모드마다 다른 기능을 보여주면 안 된다.
+function DiscountLimitCardLarge({ monthlyDiscountCharged, sizes, fmt, btnRadius }) {
+  const progressPct = Math.min(100, (monthlyDiscountCharged / MONTHLY_DISCOUNT_LIMIT) * 100)
   return (
     <div style={{
       backgroundColor: colors.surface.card,
@@ -113,12 +95,12 @@ function CashbackToggleCardLarge({ cashbackBalance, cashbackMode, setCashbackMod
       padding: spacing[5],
       boxShadow: shadow.card,
     }}>
-      {/* 캐시백 잔액 */}
+      {/* 1줄: 라벨 + % */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'baseline',
-        marginBottom: spacing[4],
+        marginBottom: spacing[3],
       }}>
         <span style={{
           fontSize: sizes.md,
@@ -126,7 +108,7 @@ function CashbackToggleCardLarge({ cashbackBalance, cashbackMode, setCashbackMod
           color: colors.gray[700],
           fontFamily: typography.fontFamily,
         }}>
-          캐시백
+          이번 달 할인충전
         </span>
         <span style={{
           fontSize: sizes.xl,
@@ -134,20 +116,32 @@ function CashbackToggleCardLarge({ cashbackBalance, cashbackMode, setCashbackMod
           color: colors.teal[500],
           fontFamily: typography.fontFamily,
         }}>
-          {fmt(cashbackBalance)}원
+          {Math.round(progressPct)}%
         </span>
       </div>
 
-      {/* 자동/수동 토글 — 활성 primary 채움 + 체크 */}
-      <div style={{ display: 'flex', gap: spacing[2] }}>
-        <button onClick={() => setCashbackMode('auto')} style={toggleBtn(cashbackMode === 'auto')}>
-          {cashbackMode === 'auto' && <Check size={18} />}
-          자동 사용
-        </button>
-        <button onClick={() => setCashbackMode('manual')} style={toggleBtn(cashbackMode === 'manual')}>
-          {cashbackMode === 'manual' && <Check size={18} />}
-          수동 사용
-        </button>
+      {/* 진행바 */}
+      <div style={{
+        height: 10,
+        backgroundColor: colors.gray[100],
+        borderRadius: layout.radiusPill,
+        overflow: 'hidden',
+        marginBottom: spacing[3],
+      }}>
+        <div style={{
+          height: '100%',
+          width: `${progressPct}%`,
+          backgroundColor: colors.teal[500],
+          transition: 'width 280ms cubic-bezier(0.23,1,0.32,1)',
+        }} />
+      </div>
+
+      {/* 금액 */}
+      <div style={{ fontSize: sizes.sm, color: colors.gray[500], fontFamily: typography.fontFamily }}>
+        사용액 {fmt(monthlyDiscountCharged)}원 / {fmt(MONTHLY_DISCOUNT_LIMIT)}원
+      </div>
+      <div style={{ marginTop: spacing[2], fontSize: sizes.xs, color: colors.gray[500], fontFamily: typography.fontFamily }}>
+        한도를 넘으면 할인 없이 충전해요
       </div>
     </div>
   )
@@ -378,9 +372,8 @@ export default function HomePageLarge() {
     hasCard,
     balance,
     cashbackBalance,
-    cashbackMode,
-    setCashbackMode,
     monthlyAccumulated,
+    monthlyDiscountCharged,
   } = useUser()
   const fmt = (n) => n.toLocaleString('ko-KR')
 
@@ -413,10 +406,8 @@ export default function HomePageLarge() {
               btnRadius={btnRadius}
             />
 
-            <CashbackToggleCardLarge
-              cashbackBalance={cashbackBalance}
-              cashbackMode={cashbackMode}
-              setCashbackMode={setCashbackMode}
+            <DiscountLimitCardLarge
+              monthlyDiscountCharged={monthlyDiscountCharged}
               sizes={sizes}
               fmt={fmt}
               btnRadius={btnRadius}
@@ -427,7 +418,7 @@ export default function HomePageLarge() {
               cashbackBalance={cashbackBalance}
               sizes={sizes}
               fmt={fmt}
-              onClick={() => navigate('/cashback')}
+              onClick={() => navigate('/benefits')}
             />
 
             <ActionCardLarge

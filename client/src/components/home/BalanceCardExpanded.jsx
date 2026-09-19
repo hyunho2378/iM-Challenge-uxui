@@ -6,8 +6,7 @@
  */
 
 import { useNavigate } from 'react-router-dom'
-import { Check } from 'lucide-react'
-import { useUser } from '../../context/UserContext'
+import { useUser, MONTHLY_DISCOUNT_LIMIT } from '../../context/UserContext'
 import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
 import { usePlatform } from '../../hooks/usePlatform'
 
@@ -16,7 +15,7 @@ export default function BalanceCardExpanded({
   refundButtonRef,
 }) {
   const navigate = useNavigate()
-  const { balance, cashbackBalance, cashbackMode, setCashbackMode, monthlyAccumulated } = useUser()
+  const { balance, cashbackBalance, monthlyDiscountCharged } = useUser()
   const isAndroid = usePlatform() === 'android'
 
   const fmt = (n) => n.toLocaleString('ko-KR') + '원'
@@ -107,26 +106,11 @@ export default function BalanceCardExpanded({
           </p>
         </div>
 
-        {/* 캐시백 통합 박스 — 흰 배경 + 민트 진행바 + 토글 */}
+        {/* 06차 1번: 캐시백 자동/수동 토글 → 이번 달 할인충전 한도 진행률로 교체.
+            iM샵 실측(전사.md S09 "월충전한도 300,000")을 그대로 쓴다. 이 한도를 넘기면
+            ChargeScreen이 AI 개입(할인없이충전 유도)을 띄운다 — 그 배경을 여기서 미리 보여준다. */}
         {(() => {
-          const progressPct = Math.min(100, (monthlyAccumulated / 30000) * 100)
-          const modeBtn = (active) => ({
-            flex: 1,
-            height: 48,
-            backgroundColor: active ? colors.primary[700] : colors.surface.card,
-            border: `2px solid ${active ? colors.primary[700] : colors.gray[200]}`,
-            color: active ? colors.onDark.primary : colors.gray[500],
-            borderRadius: isAndroid ? layout.radiusPill : layout.radiusButton,
-            fontSize: typography.size.sm,
-            fontWeight: typography.weight.bold,
-            cursor: 'pointer',
-            fontFamily: typography.fontFamily,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: spacing[1],
-            transition: 'background-color 200ms ease-out, border-color 200ms ease-out, color 200ms ease-out',
-          })
+          const progressPct = Math.min(100, (monthlyDiscountCharged / MONTHLY_DISCOUNT_LIMIT) * 100)
           return (
             <div style={{
               marginTop: spacing[3],
@@ -135,7 +119,7 @@ export default function BalanceCardExpanded({
               backgroundColor: colors.surface.card,
               borderRadius: layout.radiusCard,
             }}>
-              {/* 1줄: 캐시백 라벨 + % */}
+              {/* 1줄: 라벨 + % */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -147,7 +131,7 @@ export default function BalanceCardExpanded({
                   fontWeight: typography.weight.semibold,
                   color: colors.gray[900],
                 }}>
-                  캐시백
+                  이번 달 할인충전
                 </span>
                 <span style={{
                   fontSize: typography.size.sm,
@@ -179,47 +163,25 @@ export default function BalanceCardExpanded({
                 display: 'flex',
                 justifyContent: 'space-between',
                 fontSize: typography.size.xs,
-                marginBottom: spacing[4],
               }}>
                 <span style={{ color: colors.gray[500] }}>
-                  이번달 적립
+                  사용액
                 </span>
                 <span style={{
                   color: colors.gray[900],
                   fontWeight: typography.weight.medium,
                 }}>
-                  {monthlyAccumulated.toLocaleString('ko-KR')}원 / 30,000원
+                  {monthlyDiscountCharged.toLocaleString('ko-KR')}원 / {MONTHLY_DISCOUNT_LIMIT.toLocaleString('ko-KR')}원
                 </span>
               </div>
 
-              {/* 4줄: 구분선 */}
-              <div style={{
-                height: 1,
-                backgroundColor: colors.gray[100],
-                marginBottom: spacing[3],
-              }} />
-
-              {/* 5줄: 자동/수동 토글 */}
-              <div style={{ display: 'flex', gap: spacing[2] }}>
-                <button onClick={() => setCashbackMode('auto')} style={modeBtn(cashbackMode === 'auto')}>
-                  {cashbackMode === 'auto' && <Check size={14} />}
-                  자동 충전
-                </button>
-                <button onClick={() => setCashbackMode('manual')} style={modeBtn(cashbackMode === 'manual')}>
-                  {cashbackMode === 'manual' && <Check size={14} />}
-                  수동 사용
-                </button>
-              </div>
-
-              {/* 04차 D-2: 두 모드가 무엇을 바꾸는지 설명이 없던 문제 — 실제 동작 그대로 한 줄 설명 */}
+              {/* 한도를 넘기면 실제로 무슨 일이 생기는지 설명 — ChargeScreen의 AI 개입과 같은 문구 톤 */}
               <p style={{
                 margin: `${spacing[2]} 0 0`,
                 fontSize: typography.size.xxs,
                 color: colors.gray[500],
               }}>
-                {cashbackMode === 'auto'
-                  ? '결제할 때 캐시백을 자동으로 먼저 써요'
-                  : '결제할 때 잔액만 쓰고 캐시백은 남겨둬요'}
+                한도를 넘으면 할인 없이 충전해요
               </p>
             </div>
           )

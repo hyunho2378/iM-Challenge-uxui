@@ -89,9 +89,9 @@ export default function HomePage() {
               chargeButtonRef={chargeButtonRef}
               refundButtonRef={refundButtonRef}
             />
-            {/* B7: 진입 카드 — 클릭 시 바로 /cashback 진입 */}
+            {/* B7: 진입 카드 — 06차 5번: 죽은 /cashback 대신 새 혜택 현황 페이지로 연결 */}
             <div style={{ marginTop: spacing[2] }}>
-              <CashbackEntryCard onClick={() => navigate('/cashback')} />
+              <CashbackEntryCard onClick={() => navigate('/benefits')} />
             </div>
           </>
         ) : (

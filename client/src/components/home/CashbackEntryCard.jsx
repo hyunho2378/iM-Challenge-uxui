@@ -1,7 +1,7 @@
 /**
  * CashbackEntryCard (B7)
  * hasCard true 시 잔액 카드 바로 아래 노출
- * 클릭 시 5월 캐시백 모달 오픈
+ * 06차 5번: 혜택 현황 페이지(/benefits)로 연결
  */
 
 import { Info, ChevronRight } from 'lucide-react'
@@ -35,14 +35,14 @@ export default function CashbackEntryCard({ onClick }) {
           fontWeight: typography.weight.semibold,
           color: colors.gray[900],
         }}>
-          캐시백 내역 확인하기
+          혜택 현황 보기
         </p>
         <p style={{
           margin: `${spacing[1]} 0 0 0`,
           fontSize: typography.size.xs,
           color: colors.gray[500],
         }}>
-          이번 달 적립금 확인
+          소득공제와 이번 달 할인충전 사용액 확인
         </p>
       </div>
       <ChevronRight size={20} color={colors.gray[400]} />

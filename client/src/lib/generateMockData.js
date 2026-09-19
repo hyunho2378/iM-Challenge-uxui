@@ -54,6 +54,7 @@ export function generateMockData() {
     id: nextId++,
     date: START_DATE.toISOString(),
     type: 'charge',
+    discounted: true,
     totalAmount: firstChargeAmount,
     paidByCashback: 0,
     paidByBalance: firstChargeAmount,
@@ -104,6 +105,7 @@ export function generateMockData() {
         id: nextId++,
         date: event.date.toISOString(),
         type: 'charge',
+        discounted: true,
         totalAmount: amount,
         paidByCashback: 0,
         paidByBalance: amount,
@@ -129,6 +131,7 @@ export function generateMockData() {
           id: nextId++,
           date: refillDate.toISOString(),
           type: 'charge',
+          discounted: true,
           totalAmount: refillAmount,
           paidByCashback: 0,
           paidByBalance: refillAmount,
@@ -296,6 +299,7 @@ export function generateMockData() {
       id: nextId++,
       date: date.toISOString(),
       type: 'charge',
+      discounted: true,
       totalAmount: refillAmount,
       paidByCashback: 0,
       paidByBalance: refillAmount,
@@ -334,10 +338,16 @@ export function generateMockData() {
   // 6. 최신 순 정렬 (이용내역 표시용)
   transactions.sort((a, b) => new Date(b.date) - new Date(a.date))
 
+  // 06차: 이번 달(CURRENT_MONTH) 할인충전 사용액 — 월한도 300,000 위젯 초기값
+  const monthlyDiscountCharged = transactions
+    .filter((t) => t.type === 'charge' && t.discounted && getMonthKey(new Date(t.date)) === CURRENT_MONTH)
+    .reduce((sum, t) => sum + t.totalAmount, 0)
+
   return {
     balance,
     cashbackBalance: cashback,
     monthlyAccumulated: monthlyCashbackEarned[CURRENT_MONTH] || 0,
+    monthlyDiscountCharged,
     transactions,
   }
 }

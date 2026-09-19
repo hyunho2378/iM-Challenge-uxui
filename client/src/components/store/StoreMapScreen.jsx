@@ -120,6 +120,11 @@ function shortAddress(addr) {
   return addr.replace(/^대구광역시\s*/, '')
 }
 
+function formatDistanceKm(km) {
+  if (typeof km !== 'number') return ''
+  return km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`
+}
+
 function TabButton({ label, active, onClick }) {
   return (
     <button
@@ -289,6 +294,16 @@ export default function StoreMapScreen() {
 
   const onLoad = (map) => setMapRef(map)
   const onUnmount = () => setMapRef(null)
+
+  // 06차 6번: 카테고리 클릭 → 배너 노출 → 배너에서 매장 선택 → 지도 이동.
+  // 상세 시트는 열지 않는다(가볍게 둘러보고 위치만 확인하는 용도. 상세는 리스트/마커 탭에서).
+  const handleBannerSelect = (store) => {
+    setSelectedStore(store)
+    if (mapRef) {
+      mapRef.panTo({ lat: store.lat, lng: store.lng })
+      mapRef.setZoom(17)
+    }
+  }
 
   const handleSelectSuggestion = (store) => {
     setSearchQuery(store.name)
@@ -554,6 +569,61 @@ export default function StoreMapScreen() {
             />
           ))}
         </div>
+
+        {/* 06차 6번: 카테고리 선택 시 배너 노출 — 선택하면 지도가 그 위치로 이동한다 */}
+        {activeCategory !== '전체' && (
+          <div
+            style={{
+              position: 'absolute',
+              top: `calc(${layout.topBarHeight} + 48px + 40px + ${spacing[3]})`,
+              left: 0,
+              right: 0,
+              zIndex: 10,
+              display: 'flex',
+              gap: spacing[2],
+              padding: `0 ${layout.margin}`,
+              overflowX: 'auto',
+              scrollbarWidth: 'none',
+            }}
+          >
+            {listStores.slice(0, 10).map((store) => (
+              <button
+                key={store.id}
+                onClick={() => handleBannerSelect(store)}
+                style={{
+                  flexShrink: 0,
+                  width: '132px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  gap: '2px',
+                  padding: spacing[3],
+                  backgroundColor: colors.surface.card,
+                  borderRadius: layout.radiusButton,
+                  border: selectedStore?.id === store.id ? `2px solid ${colors.primary[700]}` : 'none',
+                  boxShadow: shadow.card,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <span style={{
+                  fontSize: typography.size.xs,
+                  fontWeight: typography.weight.semibold,
+                  color: colors.gray[900],
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  width: '100%',
+                }}>
+                  {store.name}
+                </span>
+                <span style={{ fontSize: typography.size.xxs, color: colors.gray[500] }}>
+                  {formatDistanceKm(store.distance)}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 목록 시트: flex: 1 */}

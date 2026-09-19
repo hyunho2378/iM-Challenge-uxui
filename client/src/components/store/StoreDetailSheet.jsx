@@ -12,6 +12,61 @@ function formatDistanceKm(km) {
   return km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`
 }
 
+// 06차 6번: 실캡처(전사.md S04 등)엔 사진 여러 장을 넘겨보는 캐러셀이 있었는데
+// 여기는 정적 placeholder 한 장뿐이었다. 실제 사진 자산은 없어서 같은 자리표시자
+// 3장 + 점 인디케이터로 "여러 장을 넘겨본다"는 구조만 재현한다.
+const PHOTO_SLOTS = 3
+
+function StorePhotoCarousel() {
+  const [index, setIndex] = useState(0)
+  return (
+    <div>
+      <div
+        style={{
+          height: '120px',
+          backgroundColor: colors.gray[200],
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+          <rect x="5" y="10" width="30" height="22" rx="3" stroke={colors.gray[400]} strokeWidth="1.5" fill="none" />
+          <circle cx="20" cy="21" r="6" stroke={colors.gray[400]} strokeWidth="1.5" fill="none" />
+          <circle cx="20" cy="21" r="3" fill={colors.gray[300]} />
+          <path d="M14 10 L15 7 L25 7 L26 10" stroke={colors.gray[400]} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: spacing[1], padding: `${spacing[2]} 0` }}>
+        {Array.from({ length: PHOTO_SLOTS }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => setIndex(i)}
+            aria-label={`${i + 1}번째 사진`}
+            style={{
+              width: '24px',
+              height: '24px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: i === index ? colors.primary[700] : colors.gray[300],
+            }} />
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function StoreDetailSheet({ isOpen, onClose, onNavigate, store }) {
   const [ownerSheetOpen, setOwnerSheetOpen] = useState(false)
   const isAndroid = usePlatform() === 'android'
@@ -43,23 +98,8 @@ export default function StoreDetailSheet({ isOpen, onClose, onNavigate, store })
     <>
       <BottomSheet isOpen={isOpen} onClose={onClose}>
         <div style={{ fontFamily: typography.fontFamily }}>
-          {/* 매장 이미지 placeholder */}
-          <div
-            style={{
-              height: '120px',
-              backgroundColor: colors.gray[200],
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-              <rect x="5" y="10" width="30" height="22" rx="3" stroke={colors.gray[400]} strokeWidth="1.5" fill="none" />
-              <circle cx="20" cy="21" r="6" stroke={colors.gray[400]} strokeWidth="1.5" fill="none" />
-              <circle cx="20" cy="21" r="3" fill={colors.gray[300]} />
-              <path d="M14 10 L15 7 L25 7 L26 10" stroke={colors.gray[400]} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
+          {/* 매장 사진 영역 — 캐러셀(06차 6번) */}
+          <StorePhotoCarousel />
 
           {/* 매장 정보 헤더 */}
           <div style={{ padding: `${spacing[4]} ${layout.margin}` }}>

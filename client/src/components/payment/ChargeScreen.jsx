@@ -8,25 +8,23 @@
  * Changed: 3-step flow (C-01·C-06), balance display (C-02), step indicator always visible
  */
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
+import { useOnboarding } from '../../context/OnboardingContext'
+import { MONTHLY_DISCOUNT_LIMIT } from '../../context/UserContext'
 import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
 import { useTypography } from '../../hooks/useTypography'
 import { usePlatform } from '../../hooks/usePlatform'
 import QuickAmountChip from './QuickAmountChip'
 import NumPad from './NumPad'
 import PaymentAuthOverlay from '../common/PaymentAuthOverlay'
+import CoachMarkOverlay from '../common/CoachMarkOverlay'
 import Button from '../common/Button'
 
 const MAX_AMOUNT = 999999999
 const UNIT_AMOUNT = 10000
-// 전사.md S09 실캡처: iM샵 소개 화면의 "월충전한도 300,000"을 그대로 트리거 조건으로 쓴다.
-// 한 번에 이 금액을 넘게 충전하려 할 때만 "할인판매 기간이 아닙니다"가 뜬다(항상 뜨지 않는다).
-// 빠른 금액 칩(+1만/+5만/+10만)을 몇 번 눌러도 30만원 이하면 정상 충전되고,
-// 30만원을 넘기면(칩을 여러 번 누르거나 큰 금액을 직접 입력하면) AI 개입 흐름을 재현할 수 있다.
-const DISCOUNT_LIMIT = 300000
 
 // 단계 표시기 — Shneiderman #8, Nielsen #1
 function StepIndicator({ current }) {
@@ -133,10 +131,16 @@ function StepIndicator({ current }) {
 
 // AI 개입지점 2 — 감지형. "할인판매 기간이 아닙니다" 에러(S16 실캡처 카피)가 뜨는
 // 바로 그 순간에 할인없이충전으로의 대안 경로를 짚어준다. IA 분석 2번(PAY-02/03 갈림길)의 해법.
-function DiscountErrorModal({ onStay, onGoChargeFree }) {
+// 08차: 라이브 API 호출 없이 순수 프론트엔드 계산으로 문구를 만든다(네트워크/키 불필요, 즉시 렌더링).
+// 시도금액·이미 사용한 할인충전액·남은 한도 세 값을 실제로 계산해 문장에 그대로 꽂는다.
+function DiscountErrorModal({ amount, monthlyDiscountCharged, onStay, onGoChargeFree }) {
   const sizes = useTypography()
+  const remaining = Math.max(0, MONTHLY_DISCOUNT_LIMIT - monthlyDiscountCharged)
+  const overAmount = amount - remaining
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    // 07차: 충전 코치마크(9999)가 뜬 채로 이 에러가 뜨면 코치마크가 이 모달을 가려
+    // "할인 없이 충전하기" 버튼을 못 누르는 문제가 있었다. 실제 액션 모달을 항상 위에 둔다.
+    <div style={{ position: 'fixed', inset: 0, zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div onClick={onStay} className="glass-scrim" style={{ position: 'absolute', inset: 0, backgroundColor: colors.surface.overlay }} />
       <div style={{
         position: 'relative', width: 'calc(100% - 64px)', maxWidth: '320px',
@@ -145,8 +149,11 @@ function DiscountErrorModal({ onStay, onGoChargeFree }) {
         <p style={{ margin: `0 0 ${spacing[2]}`, fontSize: sizes.sm, fontWeight: typography.weight.bold, color: colors.error, textAlign: 'center' }}>
           할인판매 기간이 아닙니다
         </p>
-        <p style={{ margin: `0 0 ${spacing[5]}`, fontSize: sizes.sm, color: colors.gray[700], lineHeight: typography.lineHeight.body, textAlign: 'center' }}>
-          지금은 할인 충전이 안 되는 기간이에요. 할인 없이 바로 충전할까요?
+        <p style={{ margin: `0 0 ${spacing[3]}`, fontSize: sizes.sm, color: colors.gray[700], lineHeight: typography.lineHeight.body, textAlign: 'center' }}>
+          {amount.toLocaleString('ko-KR')}원을 넣으셨는데 이번 달 할인한도가 {remaining.toLocaleString('ko-KR')}원 남아서, 나머지 {overAmount.toLocaleString('ko-KR')}원은 할인 없이 충전돼요.
+        </p>
+        <p style={{ margin: `0 0 ${spacing[5]}`, fontSize: sizes.xs, color: colors.gray[500], textAlign: 'center' }}>
+          이번 달 할인충전 사용액 {monthlyDiscountCharged.toLocaleString('ko-KR')}원 / {MONTHLY_DISCOUNT_LIMIT.toLocaleString('ko-KR')}원
         </p>
         <div style={{ display: 'flex', gap: spacing[2] }}>
           <Button variant="outlined" fullWidth={false} style={{ flex: 1 }} onClick={onStay}>아니요</Button>
@@ -157,16 +164,23 @@ function DiscountErrorModal({ onStay, onGoChargeFree }) {
   )
 }
 
-export default function ChargeScreen({ onClose, onRefundGuide, onCharge, balance = 120000, chargeLimit = 500000 }) {
+export default function ChargeScreen({ onClose, onRefundGuide, onCharge, balance = 120000, chargeLimit = 500000, monthlyDiscountCharged = 0 }) {
   const sizes = useTypography()
   const navigate = useNavigate()
   const { showSnackbar } = useApp()
+  const { hasSeenChargeFlowCoach, markSeen } = useOnboarding()
   const isAndroid = usePlatform() === 'android'
   const [amount, setAmount] = useState(0)
   const [step, setStep] = useState(1)
   const [charged, setCharged] = useState(false)
   const [showAuth, setShowAuth] = useState(false)
   const [showDiscountError, setShowDiscountError] = useState(false)
+  // 06차 2번: 처음 보는 사용자에게 단계별로 뭘 눌러야 할지 짚어준다
+  const nextButtonRef = useRef(null)
+  const chargeButtonRef = useRef(null)
+  // 1단계 코치마크는 이번 방문에서 한 번 닫으면 다시 안 뜬다. 전체를 봤다는 표시(hasSeenChargeFlowCoach)는
+  // 2단계까지 봐야 남긴다 — 그래야 실제로 2단계에 도달했을 때 2단계 코치마크가 뜬다.
+  const [step1CoachDismissed, setStep1CoachDismissed] = useState(false)
 
   const handleNumPress = (key) => {
     if (key === 'backspace') {
@@ -353,14 +367,17 @@ export default function ChargeScreen({ onClose, onRefundGuide, onCharge, balance
               borderTop: `1px solid ${colors.gray[100]}`,
             }}
           >
-            <Button
-              variant="filled"
-              size="lg"
-              disabled={!canProceed}
-              onClick={() => setStep(2)}
-            >
-              다음
-            </Button>
+            {/* Button은 forwardRef가 아니라 div로 감싸 코치마크 대상 좌표를 잡는다 */}
+            <div ref={nextButtonRef}>
+              <Button
+                variant="filled"
+                size="lg"
+                disabled={!canProceed}
+                onClick={() => setStep(2)}
+              >
+                다음
+              </Button>
+            </div>
             {/* C-04: Disabled 버튼 사유 명시 (Nielsen #5, #9 — 한국어 평문) */}
             {isOverLimit && (
               <p style={{ margin: `${spacing[2]} 0 0`, textAlign: 'center', fontSize: sizes.xs, color: colors.error }}>
@@ -471,17 +488,19 @@ export default function ChargeScreen({ onClose, onRefundGuide, onCharge, balance
             >
               수정
             </Button>
+            {/* Button은 forwardRef가 아니라 div로 감싸 코치마크 대상 좌표를 잡는다 */}
+            <div ref={chargeButtonRef} style={{ flex: 2 }}>
             <Button
               variant="filled"
               size="lg"
               fullWidth={false}
-              style={{ flex: 2 }}
+              style={{ width: '100%' }}
               disabled={charged}
               onClick={() => {
                 if (charged) return
-                // AI 개입지점 2: 이번 달 할인 한도(30만원)를 넘겨 충전하려 할 때만
+                // AI 개입지점 2: 이번 달 누적 할인충전액이 월한도(30만원)를 넘기면
                 // "할인판매 기간이 아닙니다"가 뜬다. 한도 이내면 바로 정상 충전된다.
-                if (amount > DISCOUNT_LIMIT) {
+                if (monthlyDiscountCharged + amount > MONTHLY_DISCOUNT_LIMIT) {
                   setShowDiscountError(true)
                 } else {
                   setShowAuth(true)
@@ -490,6 +509,7 @@ export default function ChargeScreen({ onClose, onRefundGuide, onCharge, balance
             >
               충전하기
             </Button>
+            </div>
           </div>
         </div>
       )}
@@ -602,8 +622,32 @@ export default function ChargeScreen({ onClose, onRefundGuide, onCharge, balance
 
       {showDiscountError && (
         <DiscountErrorModal
+          amount={amount}
+          monthlyDiscountCharged={monthlyDiscountCharged}
           onStay={() => setShowDiscountError(false)}
           onGoChargeFree={() => navigate('/charge-free', { state: { fromAssist: true, amount } })}
+        />
+      )}
+
+      {/* 06차 2번: 충전 플로우 단계별 코치마크. 1단계(금액 입력→다음), 2단계(확인→충전하기) */}
+      {!hasSeenChargeFlowCoach && !step1CoachDismissed && step === 1 && (
+        <CoachMarkOverlay
+          targetRef={nextButtonRef}
+          message="금액을 정하고 다음을 눌러주세요. 빠른 금액 버튼을 눌러도 좋아요."
+          step={1}
+          totalSteps={2}
+          onNext={() => setStep1CoachDismissed(true)}
+          onSkip={() => markSeen('chargeFlow')}
+        />
+      )}
+      {!hasSeenChargeFlowCoach && step === 2 && (
+        <CoachMarkOverlay
+          targetRef={chargeButtonRef}
+          message="내용을 확인하고 충전하기를 누르면 충전이 완료돼요."
+          step={2}
+          totalSteps={2}
+          onNext={() => markSeen('chargeFlow')}
+          onSkip={() => markSeen('chargeFlow')}
         />
       )}
     </div>

@@ -2,18 +2,20 @@
 // 05차 지시서 3번, 신규 화면. 출처: 전사.md S28(PAY-03).
 // 정상 충전(ChargeScreen)과 별개 화면이다(원본 iM샵도 별도 메뉴 항목). 진입 시 재확인 모달을 띄운다.
 // AI 개입지점 2(충전 에러 → 이 화면 유도)의 도착지가 여기다.
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react'
 import { colors, layout, typography, spacing, shadow } from '../tokens/tokens'
 import { useUser } from '../context/UserContext'
 import { useApp } from '../context/AppContext'
+import { useOnboarding } from '../context/OnboardingContext'
 import { useTypography } from '../hooks/useTypography'
 
 import ScreenContainer from '../components/layout/ScreenContainer'
 import QuickAmountChip from '../components/payment/QuickAmountChip'
 import NumPad from '../components/payment/NumPad'
 import PaymentAuthOverlay from '../components/common/PaymentAuthOverlay'
+import CoachMarkOverlay from '../components/common/CoachMarkOverlay'
 import Button from '../components/common/Button'
 
 const MAX_AMOUNT = 2000000 // S28 이용안내: 상품당 최대 충전 한도 200만원
@@ -58,6 +60,8 @@ export default function ChargeFreePage() {
   const sizes = useTypography()
   const { balance, chargeBalance, linkedBank } = useUser()
   const { showSnackbar } = useApp()
+  const { hasSeenChargeFreeCoach, markSeen } = useOnboarding()
+  const chargeButtonRef = useRef(null)
 
   // AI 개입지점 2에서 넘어온 경우 재확인 모달을 생략한다. 이미 "충전할까요?" 유도를 거쳤다
   const skipConfirm = location.state?.fromAssist === true
@@ -247,7 +251,10 @@ export default function ChargeFreePage() {
 
         {/* 하단 고정 충전 버튼 */}
         <div style={{ padding: `${spacing[3]} ${layout.margin}`, paddingBottom: `calc(env(safe-area-inset-bottom) + ${spacing[3]})`, backgroundColor: colors.surface.card, borderTop: `1px solid ${colors.gray[100]}`, flexShrink: 0 }}>
-          <Button variant="filled" size="lg" disabled={!canCharge} onClick={() => setShowAuth(true)}>충전</Button>
+          {/* Button은 forwardRef가 아니라 div로 감싸 코치마크 대상 좌표를 잡는다 */}
+          <div ref={chargeButtonRef}>
+            <Button variant="filled" size="lg" disabled={!canCharge} onClick={() => setShowAuth(true)}>충전</Button>
+          </div>
         </div>
       </div>
 
@@ -255,11 +262,24 @@ export default function ChargeFreePage() {
         open={showAuth}
         onComplete={() => {
           setShowAuth(false)
-          chargeBalance(amount)
+          // 06차 1번: 할인없이충전은 월 할인한도(30만원)를 소비하지 않는다
+          chargeBalance(amount, { discounted: false })
           setDone(true)
         }}
         onCancel={() => setShowAuth(false)}
       />
+
+      {/* 06차 2번: 신규 화면 첫 방문 안내 */}
+      {!hasSeenChargeFreeCoach && (
+        <CoachMarkOverlay
+          targetRef={chargeButtonRef}
+          message="금액을 정하고 충전을 누르면 할인 없이 바로 충전돼요."
+          step={1}
+          totalSteps={1}
+          onNext={() => markSeen('chargeFree')}
+          onSkip={() => markSeen('chargeFree')}
+        />
+      )}
     </ScreenContainer>
   )
 }
