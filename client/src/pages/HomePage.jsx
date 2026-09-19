@@ -15,7 +15,6 @@ import BottomNavBar from '../components/layout/BottomNavBar'
 import HomePageLarge from './HomePageLarge'
 
 import WidgetAddBanner from '../components/home/WidgetAddBanner'
-import BannerCarousel from '../components/home/BannerCarousel'
 import BalanceCardExpanded from '../components/home/BalanceCardExpanded'
 import CardApplyCTA from '../components/home/CardApplyCTA'
 import CashbackEntryCard from '../components/home/CashbackEntryCard'
@@ -99,9 +98,6 @@ export default function HomePage() {
 
         {/* H-01: 위젯 추가 배너 */}
         <WidgetAddBanner />
-
-        {/* 배너 캐러셀 */}
-        <BannerCarousel applyButtonRef={applyButtonRef} />
 
         {/* 결제 가능 매장 */}
         <SectionHeader

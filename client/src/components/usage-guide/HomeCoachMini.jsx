@@ -2,53 +2,11 @@
 // 홈 화면 + 코치마크 말풍선 스냅샷
 // variant: 'cardApply' | 'charge' | 'refund'
 //
-// cardApply: BannerCarousel(CARD_APPLY_SLIDE) + CardApplyCTA → 코치마크가 신청하기 버튼 가리킴
-// charge:    BannerCarousel(CASHBACK_SLIDE) + BalanceCard   → 코치마크가 충전 버튼 가리킴
-// refund:    BannerCarousel(CASHBACK_SLIDE) + BalanceCard   → 코치마크가 환불 버튼 가리킴
+// cardApply: CardApplyCTA → 코치마크가 신청하기 버튼 가리킴
+// charge:    BalanceCard  → 코치마크가 충전 버튼 가리킴
+// refund:    BalanceCard  → 코치마크가 환불 버튼 가리킴
 
 import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
-
-// ── 슬라이드 데이터 (BannerCarousel.jsx에서 복제) ──
-const CARD_APPLY_SLIDE = {
-    bgColor: colors.primary[700],
-    textColor: colors.onDark.primary,
-    subTextColor: 'rgba(255,255,255,0.85)',
-    title: '대구 곳곳에서 10% 캐시백',
-    description: '신청만 하면 바로 적용',
-    buttonLabel: '신청하기',
-    illustration: (
-        <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-            <rect x="8" y="20" width="64" height="42" rx="8" fill="rgba(255,255,255,0.18)" />
-            <rect x="8" y="20" width="64" height="42" rx="8" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
-            <rect x="16" y="34" width="20" height="14" rx="3" fill="rgba(255,255,255,0.5)" />
-            <rect x="16" y="50" width="10" height="4" rx="2" fill="rgba(255,255,255,0.35)" />
-            <rect x="30" y="50" width="10" height="4" rx="2" fill="rgba(255,255,255,0.35)" />
-            <circle cx="56" cy="34" r="10" fill="rgba(255,255,255,0.25)" />
-            <path d="M52 34 L56 38 L62 30" stroke="rgba(255,255,255,0.9)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            <circle cx="18" cy="27" r="3" fill="rgba(255,255,255,0.6)" />
-            <circle cx="62" cy="27" r="3" fill="rgba(255,255,255,0.6)" />
-        </svg>
-    ),
-}
-
-const CASHBACK_SLIDE = {
-    bgColor: colors.primary[100],
-    textColor: colors.primary[800],
-    subTextColor: colors.primary[700],
-    buttonBg: colors.primary[200],
-    buttonTextColor: colors.primary[800],
-    title: '캐시백 충전하고',
-    description: '대구 전역에서 사용하세요',
-    buttonLabel: '충전하기',
-    illustration: (
-        <svg width="76" height="64" viewBox="0 0 100 64" fill="none" style={{ transform: 'rotate(-8deg)' }}>
-            <rect width="100" height="64" rx="8" fill={colors.surface.card} />
-            <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">대구로페이</text>
-            <rect x="8" y="32" width="26" height="16" rx="3" fill={colors.gray[200]} />
-            <rect x="8" y="54" width="14" height="3" rx="1.5" fill={colors.gray[300]} />
-        </svg>
-    ),
-}
 
 const COACH = {
     cardApply: { message: '대구로페이 카드를 신청해보세요. 신청하기를 누르면 카드를 받을 수 있어요.', step: 1, total: 1 },
@@ -66,29 +24,6 @@ function MiniTopBar() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                     {[0, 1, 2].map(i => <div key={i} style={{ width: 18, height: 2, backgroundColor: colors.gray[700] }} />)}
                 </div>
-            </div>
-        </div>
-    )
-}
-
-// ── 정적 배너 슬라이드 1장 ──
-function StaticBanner({ slide }) {
-    return (
-        <div style={{ margin: `${spacing[3]} ${layout.margin} 0`, borderRadius: layout.radiusCard, overflow: 'hidden', position: 'relative' }}>
-            <div style={{ backgroundColor: slide.bgColor, height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `0 ${spacing[4]} 0 ${spacing[5]}` }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: spacing[2], flex: 1 }}>
-                    <p style={{ margin: 0, color: slide.textColor, fontSize: typography.size.md, fontWeight: typography.weight.bold, lineHeight: 1.35, whiteSpace: 'pre-line', fontFamily: typography.fontFamily }}>{slide.title}</p>
-                    <p style={{ margin: 0, color: slide.subTextColor, fontSize: typography.size.xs, fontWeight: typography.weight.medium, fontFamily: typography.fontFamily }}>{slide.description}</p>
-                    {slide.buttonLabel && (
-                        <div style={{ marginTop: spacing[1], alignSelf: 'flex-start', backgroundColor: slide.buttonBg || 'rgba(255,255,255,0.25)', color: slide.buttonTextColor || slide.textColor, borderRadius: layout.radiusButton, padding: '6px 14px', fontSize: typography.size.xs, fontWeight: typography.weight.semibold, fontFamily: typography.fontFamily }}>
-                            {slide.buttonLabel}
-                        </div>
-                    )}
-                </div>
-                <div style={{ flexShrink: 0 }}>{slide.illustration}</div>
-            </div>
-            <div style={{ position: 'absolute', bottom: spacing[2], left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: spacing[1] }}>
-                {[0, 1, 2, 3].map(i => <div key={i} style={{ width: i === 0 ? '18px' : '6px', height: '6px', borderRadius: layout.radiusPill, backgroundColor: i === 0 ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.45)' }} />)}
             </div>
         </div>
     )
@@ -157,10 +92,6 @@ function BalanceCard({ highlight }) {
                         <span style={{ fontSize: typography.size.sm, color: 'rgba(255,255,255,0.7)' }}>대구로페이</span>
                         <span style={{ fontSize: typography.size.largeTitle, color: colors.onDark.primary, fontWeight: typography.weight.bold, lineHeight: 1.1, letterSpacing: '-0.02em' }}>{fmt(112671)}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                        <span style={{ fontSize: typography.size.sm, color: 'rgba(255,255,255,0.7)' }}>캐시백</span>
-                        <span style={{ fontSize: typography.size.xl, color: colors.teal[400], fontWeight: typography.weight.bold }}>{fmt(3200)}</span>
-                    </div>
                 </div>
                 <div style={{ display: 'flex', gap: spacing[2], paddingTop: spacing[3], borderTop: '1px solid rgba(255,255,255,0.15)' }}>
                     <div style={btn('charge')}>충전</div>
@@ -204,18 +135,14 @@ export default function HomeCoachMini({ variant = 'cardApply' }) {
     const c = COACH[variant]
     const isApply = variant === 'cardApply'
 
-    // cardApply → CARD_APPLY_SLIDE, charge/refund → CASHBACK_SLIDE
-    const bannerSlide = isApply ? CARD_APPLY_SLIDE : CASHBACK_SLIDE
-
-    // 말풍선 위치
-    // cardApply: MiniTopBar(52) + banner margin(12) + banner(120) + CTA margin(16) + padding(20) + h3(47) + gap(12) + p(21) + gap(12) + marginTop(8) ≈ 320px
-    // charge/refund: MiniTopBar(52) + banner margin(12) + banner(120) + balance margin(16) + balance(~160) ≈ 370px
-    const tooltipTop = isApply ? '375px' : '370px'
+    // 말풍선 위치 (하이라이트 버튼 바로 아래)
+    // cardApply: MiniTopBar(52) + CTA margin(16) + padding(20) + h3(47) + gap(12) + p(21) + gap(12) + marginTop(8) + button(48) ≈ 237
+    // charge/refund: MiniTopBar(52) + balance margin(16) + balance(~130) ≈ 200
+    const tooltipTop = isApply ? '243px' : '200px'
 
     return (
         <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', backgroundColor: colors.surface.background, fontFamily: typography.fontFamily, position: 'relative' }}>
             <MiniTopBar />
-            <StaticBanner slide={bannerSlide} />
             {isApply ? <CardApplyCTA /> : <BalanceCard highlight={c.highlight} />}
             <CoachTooltip message={c.message} step={c.step} total={c.total} top={tooltipTop} />
         </div>

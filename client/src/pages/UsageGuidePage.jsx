@@ -21,7 +21,7 @@ const GUIDE = {
   0: { // 카드 신청
     intro: '대구로페이 카드를 신청하는 방법이에요.',
     steps: [
-      { no: '01', title: '홈에서 카드 신청을 시작해요', desc: '홈 화면의 [신청하기] 버튼을 눌러 카드 신청을 시작해요.', render: <HomeCoachMini variant="cardApply" />, h: 600 },
+      { no: '01', title: '홈에서 카드 신청을 시작해요', desc: '홈 화면의 [신청하기] 버튼을 눌러 카드 신청을 시작해요.', render: <HomeCoachMini variant="cardApply" />, h: 470 },
       { no: '02', title: '혜택받을 카드를 선택해요', desc: '대구로페이 카드의 혜택을 확인하고 [간편 신청하기]를 눌러주세요.', render: <CardApplyMini step="select" />, h: 760 },
       { no: '03', title: '배송 완료 후 카드를 등록해요', desc: '카드가 배송되면 앞면 16자리 번호를 입력해 등록해주세요.', render: <CardApplyMini step="shipped" />, h: 600 },
     ],
@@ -29,7 +29,7 @@ const GUIDE = {
   1: { // 충전
     intro: 'iM샵을 충전하는 방법이에요.',
     steps: [
-      { no: '01', title: '홈에서 충전을 시작해요', desc: '홈 잔액 카드의 [충전] 버튼을 눌러주세요.', render: <HomeCoachMini variant="charge" />, h: 620 },
+      { no: '01', title: '홈에서 충전을 시작해요', desc: '홈 잔액 카드의 [충전] 버튼을 눌러주세요.', render: <HomeCoachMini variant="charge" />, h: 400 },
       { no: '02', title: '충전 금액을 입력해요', desc: '빠른 금액 버튼을 누르거나 직접 입력한 뒤 [다음]을 눌러주세요.', render: <ChargeMini step={1} amount={50000} balance={120000} />, h: 720 },
       { no: '03', title: '충전 내용을 확인해요', desc: '충전 금액과 충전 후 잔액을 확인하고 [충전하기]를 눌러주세요.', render: <ChargeMini step={2} amount={50000} balance={120000} />, h: 600 },
       { no: '04', title: '충전이 완료돼요', desc: '얼굴인증이 끝나면 즉시 충전이 완료됩니다.', render: <ChargeMini step={3} amount={50000} balance={120000} />, h: 600 },
@@ -38,7 +38,7 @@ const GUIDE = {
   2: { // 환불
     intro: '충전한 금액을 환불하는 방법이에요.',
     steps: [
-      { no: '01', title: '홈에서 환불을 시작해요', desc: '홈 잔액 카드의 [환불] 버튼을 눌러주세요.', render: <HomeCoachMini variant="refund" />, h: 620 },
+      { no: '01', title: '홈에서 환불을 시작해요', desc: '홈 잔액 카드의 [환불] 버튼을 눌러주세요.', render: <HomeCoachMini variant="refund" />, h: 425 },
       { no: '02', title: '충전 내역에서 환불을 선택해요', desc: '환불 가능한 충전 건의 [환불] 버튼을 눌러주세요. 조건 미충족 시 사유가 표시됩니다.', render: <RefundMini step="list" balance={112671} />, h: 720 },
       { no: '03', title: '환불 내용을 확인하고 신청해요', desc: '환불 금액을 확인하고 [신청하기]를 누르면 얼굴인증 후 환불이 진행됩니다.', render: <RefundMini step="confirm" balance={112671} />, h: 720 },
     ],

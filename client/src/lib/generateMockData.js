@@ -11,6 +11,7 @@ const CURRENT_MONTH = '2026-05'  // 이번 달 = 26년 5월
 const MIN_BALANCE = 20000
 const CASHBACK_RATE = 0.10
 const MONTHLY_CASHBACK_CAP = 30000
+const MONTHLY_DISCOUNT_LIMIT = 300000  // UserContext의 MONTHLY_DISCOUNT_LIMIT와 같은 값(전사.md S09 월충전한도)
 
 // 헬퍼
 function randomBetween(min, max) {
@@ -335,6 +336,20 @@ export function generateMockData() {
     tx.balanceAfter = runningBalance
   }
 
+  // ─────────────────────────────────────────
+  // 6.8. 월 할인충전 한도 적용
+  // 충전 시점이 랜덤이라 그대로 두면 어느 달이든 한도를 넘는 할인충전 사용액이 나온다.
+  // 그 달 한도를 넘는 충전은 할인없이충전(discounted: false)으로 돌린다. 금액·잔액은 그대로다.
+  // ─────────────────────────────────────────
+  const discountedUsed = {}
+  for (const tx of chronological) {
+    if (tx.type !== 'charge' || !tx.discounted) continue
+    const monthKey = getMonthKey(new Date(tx.date))
+    const used = discountedUsed[monthKey] || 0
+    if (used + tx.totalAmount > MONTHLY_DISCOUNT_LIMIT) tx.discounted = false
+    else discountedUsed[monthKey] = used + tx.totalAmount
+  }
+
   // 6. 최신 순 정렬 (이용내역 표시용)
   transactions.sort((a, b) => new Date(b.date) - new Date(a.date))
 
@@ -368,6 +383,18 @@ export function _devValidate() {
   }
   if (data.monthlyAccumulated > MONTHLY_CASHBACK_CAP) {
     issues.push(`이번달 적립 한도 초과: ${data.monthlyAccumulated}`)
+  }
+
+  // 월별 할인충전 한도 검증 (6.8)
+  const usedByMonth = {}
+  for (const t of data.transactions) {
+    if (t.type !== 'charge' || !t.discounted) continue
+    const k = getMonthKey(new Date(t.date))
+    usedByMonth[k] = (usedByMonth[k] || 0) + t.totalAmount
+  }
+  const overMonth = Object.entries(usedByMonth).find(([, v]) => v > MONTHLY_DISCOUNT_LIMIT)
+  if (overMonth) {
+    issues.push(`할인충전 월한도 초과: ${overMonth[0]} ${overMonth[1]}`)
   }
 
   // 잔액 정규화 검증 (v5)
