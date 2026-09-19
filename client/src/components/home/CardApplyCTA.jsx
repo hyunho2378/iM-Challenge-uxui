@@ -32,7 +32,7 @@ export default function CardApplyCTA({ applyButtonRef }) {
             lineHeight: 1.3,
             fontFamily: typography.fontFamily,
           }}>
-            iM샵 카드를<br />신청하세요
+            대구로페이 카드를<br />신청하세요
           </h3>
           <p style={{
             margin: 0,
@@ -66,7 +66,7 @@ export default function CardApplyCTA({ applyButtonRef }) {
         <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: spacing[3] }}>
           <svg width="100" height="84" viewBox="0 0 100 64" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transform: 'rotate(-8deg)' }}>
             <rect x="0" y="0" width="100" height="64" rx="8" fill={colors.surface.card} />
-            <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">iM샵</text>
+            <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">대구로페이</text>
             <rect x="8" y="32" width="26" height="16" rx="3" fill={colors.gray[200]} />
             <rect x="8" y="54" width="14" height="3" rx="1.5" fill={colors.gray[300]} />
           </svg>

@@ -153,12 +153,15 @@ export function UserProvider({ children }) {
   const { sessionId } = useApp()
   const [hasCard, setHasCard] = useState(false)
   const [cardStatus, setCardStatus] = useState('none')
+  // 05차: 연결계좌 등록 상태 (PAY-01/PAY-03). 은행명 문자열 또는 미등록 시 null
+  const [linkedBank, setLinkedBank] = useState(null)
   // 'charge' | 'payment' | 'refund' | null. 서버 기록에 실패한 마지막 동작
   const [lastError, setLastError] = useState(null)
   const [state, dispatch] = useReducer(userReducer, EMPTY_INITIAL)
 
   const applyCard = useCallback(() => setCardStatus('applying'), [])
   const shipCard = useCallback(() => setCardStatus('shipped'), [])
+  const linkAccount = useCallback((bankName) => setLinkedBank(bankName), [])
 
   // 카드 등록 시점에 가상 거래 데이터 주입
   const registerCard = useCallback(() => {
@@ -222,6 +225,8 @@ export function UserProvider({ children }) {
       applyCard,
       shipCard,
       registerCard,
+      linkedBank,
+      linkAccount,
       chargeBalance,
       spendBalance,
       refundTransaction,

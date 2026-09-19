@@ -3,7 +3,7 @@
 
 import { ChevronRight } from 'lucide-react'
 import { colors, typography, layout, spacing } from '../../tokens/tokens'
-import { GANGNEUNG_STATION, calculateDistance } from '../../data/stores'
+import { DAEGU_STATION, calculateDistance } from '../../data/stores'
 
 const CATEGORY_COLORS = {
   음식점: colors.store.category.food,
@@ -127,7 +127,7 @@ export default function StoreListItem({ store, onClick }) {
   const distanceKm = typeof distance === 'number'
     ? distance
     : (typeof lat === 'number' && typeof lng === 'number'
-      ? calculateDistance(GANGNEUNG_STATION.lat, GANGNEUNG_STATION.lng, lat, lng)
+      ? calculateDistance(DAEGU_STATION.lat, DAEGU_STATION.lng, lat, lng)
       : null)
   const distanceLabel = distanceKm != null ? formatDistanceKm(distanceKm) : null
 

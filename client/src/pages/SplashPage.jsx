@@ -1,4 +1,4 @@
-import LogoWhite from '../assets/logos/logo-white.svg'
+import Logo from '../assets/logos/logo.png'
 import { colors, typography, spacing } from '../tokens/tokens'
 
 export default function SplashPage() {
@@ -15,7 +15,7 @@ export default function SplashPage() {
       fontFamily: typography.fontFamily,
     }}>
       <img
-        src={LogoWhite}
+        src={Logo}
         alt="iM샵"
         style={{
           width: '80px',

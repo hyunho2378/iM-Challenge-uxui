@@ -102,7 +102,7 @@ export default function AnnouncementModal({ isOpen = true, onDismiss, onClose })
                 lineHeight: 1.5,
               }}
             >
-              강릉 사랑페이 카드로 결제 시{'\n'}
+              대구로페이 카드로 결제 시{'\n'}
               최대 10% 캐시백 혜택을 드립니다.{'\n'}
               이번 달도 iM샵을 이용해 주세요!
             </div>

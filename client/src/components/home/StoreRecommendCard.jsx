@@ -2,9 +2,9 @@ import { useNavigate } from 'react-router-dom'
 import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
 
 const defaultStores = [
-  { id: 1, name: '강릉중앙시장', category: '전통시장', distance: '0.3km' },
+  { id: 1, name: '서문시장', category: '전통시장', distance: '0.3km' },
   { id: 2, name: '초당순두부마을', category: '음식점', distance: '1.2km' },
-  { id: 3, name: '강릉커피거리', category: '카페', distance: '0.8km' },
+  { id: 3, name: '동성로 카페거리', category: '카페', distance: '0.8km' },
 ]
 
 const storeColors = [colors.primary[100], colors.tag.cashBg, colors.tag.voucherBg]

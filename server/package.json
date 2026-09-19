@@ -1,7 +1,7 @@
 {
   "name": "gangnungpay-server",
   "version": "1.0.0",
-  "description": "강릉페이 리뉴얼 — Express API Server",
+  "description": "iM샵(대구로페이) 리디자인 — Express API Server",
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon src/index.js",

@@ -81,7 +81,7 @@ export default function RefundGuideModal({ isOpen, onClose }) {
               lineHeight: 1.6,
             }}
           >
-            환불 정책은 강릉시 지역화폐 운영 규정에 따르며, 사전 공지 없이 변경될 수 있습니다.
+            환불 정책은 대구광역시 지역화폐 운영 규정에 따르며, 사전 공지 없이 변경될 수 있습니다.
           </p>
         </div>
 

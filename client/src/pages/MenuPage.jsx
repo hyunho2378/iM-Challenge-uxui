@@ -120,17 +120,6 @@ const menuGroups = [
           </svg>
         ),
       },
-      {
-        id: 'gangneung-money',
-        label: '강릉머니',
-        route: null,
-        icon: (
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <circle cx="10" cy="10" r="7" stroke={colors.gray[700]} strokeWidth="1.5" />
-            <path d="M10 6v8M8 8h3.5a1.5 1.5 0 010 3H8" stroke={colors.gray[700]} strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-        ),
-      },
     ],
   },
   {

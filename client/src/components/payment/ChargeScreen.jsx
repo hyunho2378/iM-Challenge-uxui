@@ -9,6 +9,7 @@
  */
 
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
 import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
@@ -21,6 +22,11 @@ import Button from '../common/Button'
 
 const MAX_AMOUNT = 999999999
 const UNIT_AMOUNT = 10000
+// 전사.md S09 실캡처: iM샵 소개 화면의 "월충전한도 300,000"을 그대로 트리거 조건으로 쓴다.
+// 한 번에 이 금액을 넘게 충전하려 할 때만 "할인판매 기간이 아닙니다"가 뜬다(항상 뜨지 않는다).
+// 빠른 금액 칩(+1만/+5만/+10만)을 몇 번 눌러도 30만원 이하면 정상 충전되고,
+// 30만원을 넘기면(칩을 여러 번 누르거나 큰 금액을 직접 입력하면) AI 개입 흐름을 재현할 수 있다.
+const DISCOUNT_LIMIT = 300000
 
 // 단계 표시기 — Shneiderman #8, Nielsen #1
 function StepIndicator({ current }) {
@@ -125,14 +131,42 @@ function StepIndicator({ current }) {
   )
 }
 
+// AI 개입지점 2 — 감지형. "할인판매 기간이 아닙니다" 에러(S16 실캡처 카피)가 뜨는
+// 바로 그 순간에 할인없이충전으로의 대안 경로를 짚어준다. IA 분석 2번(PAY-02/03 갈림길)의 해법.
+function DiscountErrorModal({ onStay, onGoChargeFree }) {
+  const sizes = useTypography()
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div onClick={onStay} className="glass-scrim" style={{ position: 'absolute', inset: 0, backgroundColor: colors.surface.overlay }} />
+      <div style={{
+        position: 'relative', width: 'calc(100% - 64px)', maxWidth: '320px',
+        backgroundColor: colors.surface.card, borderRadius: layout.radiusCard, padding: spacing[5], boxShadow: shadow.modal,
+      }}>
+        <p style={{ margin: `0 0 ${spacing[2]}`, fontSize: sizes.sm, fontWeight: typography.weight.bold, color: colors.error, textAlign: 'center' }}>
+          할인판매 기간이 아닙니다
+        </p>
+        <p style={{ margin: `0 0 ${spacing[5]}`, fontSize: sizes.sm, color: colors.gray[700], lineHeight: typography.lineHeight.body, textAlign: 'center' }}>
+          지금은 할인 충전이 안 되는 기간이에요. 할인 없이 바로 충전할까요?
+        </p>
+        <div style={{ display: 'flex', gap: spacing[2] }}>
+          <Button variant="outlined" fullWidth={false} style={{ flex: 1 }} onClick={onStay}>아니요</Button>
+          <Button variant="filled" fullWidth={false} style={{ flex: 1 }} onClick={onGoChargeFree}>할인 없이 충전하기</Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function ChargeScreen({ onClose, onRefundGuide, onCharge, balance = 120000, chargeLimit = 500000 }) {
   const sizes = useTypography()
+  const navigate = useNavigate()
   const { showSnackbar } = useApp()
   const isAndroid = usePlatform() === 'android'
   const [amount, setAmount] = useState(0)
   const [step, setStep] = useState(1)
   const [charged, setCharged] = useState(false)
   const [showAuth, setShowAuth] = useState(false)
+  const [showDiscountError, setShowDiscountError] = useState(false)
 
   const handleNumPress = (key) => {
     if (key === 'backspace') {
@@ -445,7 +479,13 @@ export default function ChargeScreen({ onClose, onRefundGuide, onCharge, balance
               disabled={charged}
               onClick={() => {
                 if (charged) return
-                setShowAuth(true)
+                // AI 개입지점 2: 이번 달 할인 한도(30만원)를 넘겨 충전하려 할 때만
+                // "할인판매 기간이 아닙니다"가 뜬다. 한도 이내면 바로 정상 충전된다.
+                if (amount > DISCOUNT_LIMIT) {
+                  setShowDiscountError(true)
+                } else {
+                  setShowAuth(true)
+                }
               }}
             >
               충전하기
@@ -559,6 +599,13 @@ export default function ChargeScreen({ onClose, onRefundGuide, onCharge, balance
         }}
         onCancel={() => setShowAuth(false)}
       />
+
+      {showDiscountError && (
+        <DiscountErrorModal
+          onStay={() => setShowDiscountError(false)}
+          onGoChargeFree={() => navigate('/charge-free', { state: { fromAssist: true, amount } })}
+        />
+      )}
     </div>
   )
 }

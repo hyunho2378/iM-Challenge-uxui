@@ -28,7 +28,7 @@ const SERVICES = [
     ),
   },
   {
-    label: '강릉여행',
+    label: '대구여행',
     path: '/life',
     bg: colors.tag.voucherBg,
     iconColor: colors.tag.voucherText,

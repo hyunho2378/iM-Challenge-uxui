@@ -12,7 +12,7 @@ import {
   STORES,
   searchStores,
   getStoresByCategory,
-  GANGNEUNG_STATION,
+  DAEGU_STATION,
   getNearbyStores,
 } from '../../data/stores'
 import CategoryFilterChip from './CategoryFilterChip'
@@ -117,7 +117,7 @@ const CATEGORY_ICONS = {
 
 function shortAddress(addr) {
   if (!addr) return ''
-  return addr.replace(/^강원\s*강릉시\s*/, '')
+  return addr.replace(/^대구광역시\s*/, '')
 }
 
 function TabButton({ label, active, onClick }) {
@@ -166,11 +166,11 @@ export default function StoreMapScreen() {
 
   // Pre-compute nearby stores once on mount
   const allNearbyStores = useMemo(
-    () => getNearbyStores(GANGNEUNG_STATION.lat, GANGNEUNG_STATION.lng, 2000),
+    () => getNearbyStores(DAEGU_STATION.lat, DAEGU_STATION.lng, 2000),
     []
   )
   const allQrNearbyStores = useMemo(
-    () => getNearbyStores(GANGNEUNG_STATION.lat, GANGNEUNG_STATION.lng, 300, true),
+    () => getNearbyStores(DAEGU_STATION.lat, DAEGU_STATION.lng, 300, true),
     []
   )
 
@@ -318,7 +318,7 @@ export default function StoreMapScreen() {
         {isLoaded ? (
           <GoogleMap
             mapContainerStyle={{ width: '100%', height: '100%' }}
-            center={GANGNEUNG_STATION}
+            center={DAEGU_STATION}
             zoom={13}
             onLoad={onLoad}
             onUnmount={onUnmount}

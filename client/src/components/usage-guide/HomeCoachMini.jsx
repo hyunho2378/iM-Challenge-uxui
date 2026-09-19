@@ -13,7 +13,7 @@ const CARD_APPLY_SLIDE = {
     bgColor: colors.primary[700],
     textColor: colors.onDark.primary,
     subTextColor: 'rgba(255,255,255,0.85)',
-    title: '강릉 곳곳에서 10% 캐시백',
+    title: '대구 곳곳에서 10% 캐시백',
     description: '신청만 하면 바로 적용',
     buttonLabel: '신청하기',
     illustration: (
@@ -38,12 +38,12 @@ const CASHBACK_SLIDE = {
     buttonBg: colors.primary[200],
     buttonTextColor: colors.primary[800],
     title: '캐시백 충전하고',
-    description: '강릉 전역에서 사용하세요',
+    description: '대구 전역에서 사용하세요',
     buttonLabel: '충전하기',
     illustration: (
         <svg width="76" height="64" viewBox="0 0 100 64" fill="none" style={{ transform: 'rotate(-8deg)' }}>
             <rect width="100" height="64" rx="8" fill={colors.surface.card} />
-            <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">iM샵</text>
+            <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">대구로페이</text>
             <rect x="8" y="32" width="26" height="16" rx="3" fill={colors.gray[200]} />
             <rect x="8" y="54" width="14" height="3" rx="1.5" fill={colors.gray[300]} />
         </svg>
@@ -51,7 +51,7 @@ const CASHBACK_SLIDE = {
 }
 
 const COACH = {
-    cardApply: { message: 'iM샵 카드를 신청해보세요. 신청하기를 누르면 카드를 받을 수 있어요.', step: 1, total: 1 },
+    cardApply: { message: '대구로페이 카드를 신청해보세요. 신청하기를 누르면 카드를 받을 수 있어요.', step: 1, total: 1 },
     charge: { message: '[충전] 버튼을 눌러 iM샵 잔액을 충전할 수 있습니다.', step: 1, total: 2, highlight: 'charge' },
     refund: { message: '[환불] 버튼으로 충전한 금액을 다시 환불받을 수 있습니다.', step: 2, total: 2, highlight: 'refund' },
 }
@@ -60,7 +60,7 @@ const COACH = {
 function MiniTopBar() {
     return (
         <div style={{ height: '52px', backgroundColor: colors.surface.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `0 ${layout.margin}`, borderBottom: `1px solid ${colors.gray[100]}` }}>
-            <span style={{ fontSize: typography.size.appTitle, fontWeight: typography.weight.bold, color: colors.primary[700], fontFamily: typography.fontFamily }}>iM샵</span>
+            <span style={{ fontSize: typography.size.appTitle, fontWeight: typography.weight.bold, color: colors.primary[700], fontFamily: typography.fontFamily }}>대구로페이</span>
             <div style={{ display: 'flex', gap: spacing[3], alignItems: 'center' }}>
                 <div style={{ width: 22, height: 22, borderRadius: '50%', border: `2px solid ${colors.gray[300]}` }} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
@@ -102,7 +102,7 @@ function CardApplyCTA() {
                 {/* 좌측: 텍스트 + 버튼 */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: spacing[3], flex: 1 }}>
                     <h3 style={{ margin: 0, fontSize: typography.size.lg, fontWeight: typography.weight.bold, color: colors.onDark.primary, lineHeight: 1.3, fontFamily: typography.fontFamily }}>
-                        iM샵 카드를<br />신청하세요
+                        대구로페이 카드를<br />신청하세요
                     </h3>
                     <p style={{ margin: 0, fontSize: typography.size.sm, color: colors.onDark.secondary, fontFamily: typography.fontFamily }}>최대 10% 캐시백 혜택</p>
                     {/* 신청하기 버튼 — 하이라이트 */}
@@ -126,7 +126,7 @@ function CardApplyCTA() {
                 <div style={{ flexShrink: 0, marginRight: spacing[2] }}>
                     <svg width="90" height="75" viewBox="0 0 100 64" fill="none" style={{ transform: 'rotate(-8deg)' }}>
                         <rect x="0" y="0" width="100" height="64" rx="8" fill={colors.surface.card} />
-                        <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">iM샵</text>
+                        <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">대구로페이</text>
                         <rect x="8" y="32" width="26" height="16" rx="3" fill={colors.gray[200]} />
                         <rect x="8" y="54" width="14" height="3" rx="1.5" fill={colors.gray[300]} />
                     </svg>
@@ -154,7 +154,7 @@ function BalanceCard({ highlight }) {
             <div style={{ backgroundColor: colors.surface.darkCard, borderRadius: layout.radiusCard, padding: spacing[4], boxShadow: shadow.button }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: spacing[2], marginBottom: spacing[3] }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                        <span style={{ fontSize: typography.size.sm, color: 'rgba(255,255,255,0.7)' }}>iM샵</span>
+                        <span style={{ fontSize: typography.size.sm, color: 'rgba(255,255,255,0.7)' }}>대구로페이</span>
                         <span style={{ fontSize: typography.size.largeTitle, color: colors.onDark.primary, fontWeight: typography.weight.bold, lineHeight: 1.1, letterSpacing: '-0.02em' }}>{fmt(112671)}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>

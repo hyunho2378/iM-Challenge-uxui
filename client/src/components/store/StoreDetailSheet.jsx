@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Phone, MapPin, Clock, ExternalLink } from 'lucide-react'
 import { colors, typography, layout, spacing, shadow } from '../../tokens/tokens'
 import BottomSheet from '../common/BottomSheet'
-import { GANGNEUNG_STATION, calculateDistance } from '../../data/stores'
+import { DAEGU_STATION, calculateDistance } from '../../data/stores'
 import { usePlatform } from '../../hooks/usePlatform'
 
 function formatDistanceKm(km) {
@@ -35,7 +35,7 @@ export default function StoreDetailSheet({ isOpen, onClose, onNavigate, store })
   const distanceKm = typeof distance === 'number'
     ? distance
     : (typeof lat === 'number' && typeof lng === 'number'
-      ? calculateDistance(GANGNEUNG_STATION.lat, GANGNEUNG_STATION.lng, lat, lng)
+      ? calculateDistance(DAEGU_STATION.lat, DAEGU_STATION.lng, lat, lng)
       : null)
   const distanceLabel = distanceKm != null ? formatDistanceKm(distanceKm) : null
 

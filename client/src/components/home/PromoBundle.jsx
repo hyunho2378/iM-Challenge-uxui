@@ -45,7 +45,7 @@ export default function PromoBundle() {
             marginBottom: spacing[1],
           }}
         >
-          iM샵 카드를 신청하세요
+          대구로페이 카드를 신청하세요
         </div>
         <div
           style={{

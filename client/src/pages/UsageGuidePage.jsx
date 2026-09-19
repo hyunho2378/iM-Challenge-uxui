@@ -19,10 +19,10 @@ const TABS = ['카드 신청', '충전', '환불']
 // 각 탭의 단계 정의: { no, title, desc, render }
 const GUIDE = {
   0: { // 카드 신청
-    intro: 'iM샵 카드를 신청하는 방법이에요.',
+    intro: '대구로페이 카드를 신청하는 방법이에요.',
     steps: [
       { no: '01', title: '홈에서 카드 신청을 시작해요', desc: '홈 화면의 [신청하기] 버튼을 눌러 카드 신청을 시작해요.', render: <HomeCoachMini variant="cardApply" />, h: 600 },
-      { no: '02', title: '혜택받을 카드를 선택해요', desc: 'iM샵 카드의 혜택을 확인하고 [간편 신청하기]를 눌러주세요.', render: <CardApplyMini step="select" />, h: 760 },
+      { no: '02', title: '혜택받을 카드를 선택해요', desc: '대구로페이 카드의 혜택을 확인하고 [간편 신청하기]를 눌러주세요.', render: <CardApplyMini step="select" />, h: 760 },
       { no: '03', title: '배송 완료 후 카드를 등록해요', desc: '카드가 배송되면 앞면 16자리 번호를 입력해 등록해주세요.', render: <CardApplyMini step="shipped" />, h: 600 },
     ],
   },

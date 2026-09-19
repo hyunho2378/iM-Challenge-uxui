@@ -11,7 +11,6 @@ import {
   CreditCard,
   AlertTriangle,
   RotateCcw,
-  Coins,
   Gift,
   Tag,
   Megaphone,
@@ -34,7 +33,6 @@ const MENU_ITEMS = [
   { label: '주카드/잔액 변경', icon: CreditCard, path: '/card-manage' },
   { label: '분실신고/재발급', icon: AlertTriangle, path: '/card-lost' },
   { label: '환불(출금) 신청', icon: RotateCcw, path: '/refund' },
-  { label: '강릉머니', icon: Coins, path: '/gangnungmoney' },
   { label: '내가 받은 혜택 보기', icon: Gift, path: '/benefits' },
   { label: '내 쿠폰', icon: Tag, path: '/coupons' },
   { label: '공지사항', icon: Megaphone, path: '/announcements' },
@@ -138,7 +136,7 @@ export default function MenuDrawer({ isOpen, onClose }) {
               color: colors.onDark.primary,
             }}
           >
-            강릉시민
+            김초당
           </p>
           <p
             style={{
@@ -147,7 +145,7 @@ export default function MenuDrawer({ isOpen, onClose }) {
               color: 'rgba(255,255,255,0.75)',
             }}
           >
-            gangneung@example.com
+            chodang@example.com
           </p>
         </div>
 

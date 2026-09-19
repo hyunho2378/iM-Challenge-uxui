@@ -47,9 +47,9 @@ export const colors = {
   surface: {
     background: '#F2F4F8',
     card: '#FFFFFF',
-    // 임시값: 캡처(IMG_0733)에 잔액 카드가 없어 primary.800을 그대로 앉혔다.
-    // 홈 캡처를 받으면 정밀 보정한다.
-    darkCard: '#3218D2',
+    // 05차: 원본 스크린샷 실측값(IMG_0744 드로어 다크 배경, 지배색 97만 픽셀·최고 신뢰도).
+    // IMG_0924(이벤트 페이지 CTA 섹션)에서도 같은 계열의 다크 네이비를 재확인했다.
+    darkCard: '#241F45',
     overlay: 'rgba(0,0,0,0.5)',
     // QR 스캐너 카메라 뷰포트 배경 (검정이어야 카메라 영상이 정확히 보인다)
     scannerBackdrop: '#000000',

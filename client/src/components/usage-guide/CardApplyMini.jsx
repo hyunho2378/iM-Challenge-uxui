@@ -28,8 +28,8 @@ function CardSVG() {
             <line x1="34" y1="48" x2="34" y2="70" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
             <line x1="16" y1="55" x2="44" y2="55" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
             <line x1="16" y1="62" x2="44" y2="62" stroke={colors.illustration.cardChipLine} strokeWidth="1" />
-            <text x="16" y="30" fontSize="11" fontWeight="700" fill="rgba(255,255,255,0.9)" fontFamily="sans-serif">iM샵</text>
-            <text x="16" y="122" fontSize="9" fontWeight="600" fill="rgba(255,255,255,0.7)" fontFamily="sans-serif">강릉시</text>
+            <text x="16" y="30" fontSize="11" fontWeight="700" fill="rgba(255,255,255,0.9)" fontFamily="sans-serif">대구로페이</text>
+            <text x="16" y="122" fontSize="9" fontWeight="600" fill="rgba(255,255,255,0.7)" fontFamily="sans-serif">대구시</text>
             <text x="16" y="107" fontSize="10" fill="rgba(255,255,255,0.6)" letterSpacing="2" fontFamily="monospace">•••• •••• •••• ••••</text>
         </svg>
     )
@@ -101,7 +101,7 @@ export default function CardApplyMini({ step = 'select' }) {
             </div>
 
             <div style={{ textAlign: 'center', padding: `${spacing[3]} ${layout.margin}` }}>
-                <p style={{ margin: 0, fontSize: sizes.xl, fontWeight: typography.weight.bold, color: colors.gray[900], lineHeight: 1.3 }}>강릉시에서</p>
+                <p style={{ margin: 0, fontSize: sizes.xl, fontWeight: typography.weight.bold, color: colors.gray[900], lineHeight: 1.3 }}>대구시에서</p>
                 <p style={{ margin: 0, fontSize: sizes.xl, fontWeight: typography.weight.bold, color: colors.gray[900], lineHeight: 1.3 }}>혜택받을 카드를 선택해주세요</p>
             </div>
 

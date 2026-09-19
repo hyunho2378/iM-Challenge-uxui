@@ -63,7 +63,7 @@ export default function BalanceCardExpanded({
               color: 'rgba(255,255,255,0.7)',
               fontWeight: typography.weight.medium,
             }}>
-              iM샵
+              대구로페이
             </span>
             <span style={{
               fontSize: typography.size.largeTitle,
@@ -96,6 +96,15 @@ export default function BalanceCardExpanded({
               {fmt(cashbackBalance)}
             </span>
           </div>
+
+          {/* 04차 D-2: 잔액과 캐시백의 관계를 설명 없이 병렬로만 보여주던 문제 — 한 줄 설명 추가 */}
+          <p style={{
+            margin: 0,
+            fontSize: typography.size.xxs,
+            color: 'rgba(255,255,255,0.55)',
+          }}>
+            캐시백은 잔액과 별도로 결제에 쓸 수 있는 돈이에요
+          </p>
         </div>
 
         {/* 캐시백 통합 박스 — 흰 배경 + 민트 진행바 + 토글 */}
@@ -201,6 +210,17 @@ export default function BalanceCardExpanded({
                   수동 사용
                 </button>
               </div>
+
+              {/* 04차 D-2: 두 모드가 무엇을 바꾸는지 설명이 없던 문제 — 실제 동작 그대로 한 줄 설명 */}
+              <p style={{
+                margin: `${spacing[2]} 0 0`,
+                fontSize: typography.size.xxs,
+                color: colors.gray[500],
+              }}>
+                {cashbackMode === 'auto'
+                  ? '결제할 때 캐시백을 자동으로 먼저 써요'
+                  : '결제할 때 잔액만 쓰고 캐시백은 남겨둬요'}
+              </p>
             </div>
           )
         })()}

@@ -342,7 +342,7 @@ export default function HistoryPage() {
                         fontSize: sizes.xs,
                         color: colors.gray[700],
                       }}>
-                        <span>iM샵</span>
+                        <span>대구로페이</span>
                         <span>-{fmt(t.paidByBalance)}원</span>
                       </div>
                     </div>

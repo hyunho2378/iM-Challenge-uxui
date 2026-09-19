@@ -7,7 +7,9 @@ import { Search, Bell } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { colors, typography, layout, spacing } from '../../tokens/tokens'
-import LogoBlue from '../../assets/logos/logo-blue.svg'
+// iM샵 실캡처(S01) 로고. 자체 배경(민트-그린 그라디언트)을 내장한 아이콘이라
+// 밝은/어두운 배경 어디서든 대비가 유지된다. 배경별 변형이 따로 필요 없다.
+import Logo from '../../assets/logos/logo.png'
 
 export default function TopAppBar() {
   const navigate = useNavigate()
@@ -17,8 +19,14 @@ export default function TopAppBar() {
     <div
       className="glass glass-bottom-only"
       style={{
-      position: 'sticky',
+      // 04차: sticky는 ScreenContainer의 형제 flex 안에 있어 콘텐츠가 밑으로 지나가지 않아
+      // 유리 블러가 흐릴 대상이 없었다. fixed로 바꿔 BottomNavBar와 같은 방식으로 띄운다.
+      position: 'fixed',
       top: 0,
+      left: '50%',
+      transform: 'translateX(-50%)',
+      width: '100%',
+      maxWidth: layout.viewport,
       zIndex: 100,
       height: layout.topBarHeight,
       display: 'flex',
@@ -31,7 +39,7 @@ export default function TopAppBar() {
       {/* 로고 + 텍스트 */}
       {/* 장식 예외: 브랜드 마크 tight grouping (디자인시스템 단계 3-B) */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', paddingLeft: spacing[1] }}>
-        <img src={LogoBlue} alt="iM샵" style={{ height: '22px' }} />
+        <img src={Logo} alt="iM샵" style={{ height: '22px' }} />
         <span style={{
           fontSize: typography.size.xl,
           fontWeight: typography.weight.bold,
@@ -50,7 +58,9 @@ export default function TopAppBar() {
         <button
           onClick={toggleLargeText}
           style={{
-            padding: '4px 10px',
+            // 04차: 시니어 접근성 진입점 자체가 약 24px로 화면에서 가장 작은 문제 — touchMin으로 상향
+            minHeight: layout.touchMin,
+            padding: `0 ${spacing[3]}`,
             borderRadius: layout.radiusPill,
             border: `1px solid ${isLargeText ? colors.primary[300] : colors.gray[200]}`,
             backgroundColor: isLargeText ? colors.primary[100] : colors.surface.card,

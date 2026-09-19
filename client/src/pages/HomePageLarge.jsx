@@ -31,7 +31,7 @@ function BalanceCardLarge({ balance, sizes, navigate, fmt, btnRadius }) {
           color: 'rgba(255,255,255,0.85)',
           fontFamily: typography.fontFamily,
         }}>
-          iM샵
+          대구로페이
         </span>
         <span style={{
           fontSize: sizes.balance,
@@ -174,7 +174,7 @@ function CardApplyCTALarge({ sizes, navigate, btnRadius }) {
           marginBottom: spacing[2],
           fontFamily: typography.fontFamily,
         }}>
-          iM샵 카드를<br />신청하세요
+          대구로페이 카드를<br />신청하세요
         </div>
         <div style={{
           fontSize: sizes.md,
@@ -392,7 +392,8 @@ export default function HomePageLarge() {
         flex: 1,
         minHeight: 0,
         overflowY: 'auto',
-        paddingTop: spacing[3],
+        // 04차: TopAppBarLargeText가 fixed(52px)로 바뀌어 레이아웃에서 빠졌으므로 더해준다
+        paddingTop: `calc(52px + ${spacing[3]})`,
         paddingLeft: layout.margin,
         paddingRight: layout.margin,
         paddingBottom: 'calc(env(safe-area-inset-bottom) + 100px)',

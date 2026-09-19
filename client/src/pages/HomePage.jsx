@@ -5,7 +5,7 @@ import { useApp } from '../context/AppContext'
 import { useUser } from '../context/UserContext'
 import { useOnboarding } from '../context/OnboardingContext'
 import { colors, layout, spacing, shadow, typography } from '../tokens/tokens'
-import { STORES, GANGNEUNG_STATION, calculateDistance } from '../data/stores'
+import { STORES, DAEGU_STATION, calculateDistance } from '../data/stores'
 import CoachMarkOverlay from '../components/common/CoachMarkOverlay'
 
 import ScreenContainer from '../components/layout/ScreenContainer'
@@ -22,12 +22,12 @@ import CashbackEntryCard from '../components/home/CashbackEntryCard'
 import SectionHeader from '../components/home/SectionHeader'
 import StoreRecommendCard from '../components/home/StoreRecommendCard'
 
-const FEATURED_IDS = [2630781, 646727, 3401394]
+const FEATURED_IDS = [9000001, 9000011, 9000021]
 const featuredStores = FEATURED_IDS
   .map((id) => STORES.find((s) => s.id === id))
   .filter(Boolean)
   .map((s) => {
-    const km = calculateDistance(GANGNEUNG_STATION.lat, GANGNEUNG_STATION.lng, s.lat, s.lng)
+    const km = calculateDistance(DAEGU_STATION.lat, DAEGU_STATION.lng, s.lat, s.lng)
     return { ...s, distance: km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km` }
   })
 
@@ -78,15 +78,11 @@ export default function HomePage() {
           minHeight: 0,
           overflowY: 'auto',
           backgroundColor: colors.surface.background,
+          // 04차: TopAppBar가 fixed로 바뀌어 레이아웃에서 빠졌으므로 그만큼 상단 여백을 준다
+          paddingTop: layout.topBarHeight,
         }}
       >
-        {/* H-01: 위젯 추가 배너 */}
-        <WidgetAddBanner />
-
-        {/* 배너 캐러셀 */}
-        <BannerCarousel applyButtonRef={applyButtonRef} />
-
-        {/* B4: 카드 보유 여부 분기 */}
+        {/* 04차 4번: 핵심 태스크(잔액/충전)를 프로모션보다 위로. iM샵 원본도 이 순서가 문제였다 */}
         {hasCard ? (
           <>
             <BalanceCardExpanded
@@ -102,6 +98,12 @@ export default function HomePage() {
           // B6: 신규 사용자 CTA 카드
           <CardApplyCTA applyButtonRef={applyButtonRef} />
         )}
+
+        {/* H-01: 위젯 추가 배너 */}
+        <WidgetAddBanner />
+
+        {/* 배너 캐러셀 */}
+        <BannerCarousel applyButtonRef={applyButtonRef} />
 
         {/* 결제 가능 매장 */}
         <SectionHeader
@@ -157,7 +159,7 @@ export default function HomePage() {
         <CoachMarkOverlay
           targetRef={applyButtonRef}
           placement="bottom"
-          message="iM샵 카드를 신청해보세요. 신청하기를 누르면 1초 만에 카드를 받을 수 있어요."
+          message="대구로페이 카드를 신청해보세요. 신청하기를 누르면 1초 만에 카드를 받을 수 있어요."
           step={1}
           totalSteps={1}
           onNext={() => {

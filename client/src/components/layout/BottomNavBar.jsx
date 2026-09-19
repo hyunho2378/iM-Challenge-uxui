@@ -1,13 +1,14 @@
 /**
- * BottomNavBar (A2)
- * 5탭 균등: 홈·결제매장·혜택·이용내역·MY
- * QR 중앙 원형 제거 — QR 진입은 잔액 카드 3번 슬롯으로 이동
+ * BottomNavBar
+ * 05차 지시서 2번: iM샵 실제 구조엔 바텀내비가 없고 햄버거 드로어 하나뿐이다(IA 병리 확정).
+ * 이미 완성된 이 컴포넌트를 재사용해 바텀내비를 to-be 개선으로 얹는다.
+ * 5탭: 홈·충전·결제(QR 포함)·이용내역·SHOP·쿠폰·MY. "지원금·혜택"은 iM샵에 대응 화면이 없어 제거.
  * Strategy: Nielsen #4 consistency, Shneiderman #1
  */
 
 import { cloneElement } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Home, Store, Gift, Receipt, User } from 'lucide-react'
+import { Home, Store, QrCode, Receipt, User } from 'lucide-react'
 import { colors, typography, layout, spacing, md3Shape } from '../../tokens/tokens'
 import { useTypography } from '../../hooks/useTypography'
 import { usePlatform } from '../../hooks/usePlatform'
@@ -19,9 +20,9 @@ export default function BottomNavBar() {
   function getActiveKey() {
     const p = location.pathname
     if (p === '/') return 'home'
-    if (p.startsWith('/store')) return 'store'
-    if (p.startsWith('/support')) return 'support'
+    if (p.startsWith('/qr') || p.startsWith('/charge')) return 'pay'
     if (p.startsWith('/history')) return 'history'
+    if (p.startsWith('/store') || p.startsWith('/coupon')) return 'store'
     if (p.startsWith('/my')) return 'my'
     return ''
   }
@@ -57,10 +58,10 @@ export default function BottomNavBar() {
         isAndroid={isAndroid}
       />
       <NavTab
-        label="결제매장"
-        icon={<Store size={24} strokeWidth={1.8} />}
-        active={activeKey === 'store'}
-        onClick={() => navigate('/store')}
+        label="충전·결제"
+        icon={<QrCode size={24} strokeWidth={1.8} />}
+        active={activeKey === 'pay'}
+        onClick={() => navigate('/qr')}
         height={NAV_HEIGHT}
         isAndroid={isAndroid}
       />
@@ -73,10 +74,10 @@ export default function BottomNavBar() {
         isAndroid={isAndroid}
       />
       <NavTab
-        label="지원금·혜택"
-        icon={<Gift size={24} strokeWidth={1.8} />}
-        active={activeKey === 'support'}
-        onClick={() => navigate('/support')}
+        label="SHOP·쿠폰"
+        icon={<Store size={24} strokeWidth={1.8} />}
+        active={activeKey === 'store'}
+        onClick={() => navigate('/store')}
         height={NAV_HEIGHT}
         isAndroid={isAndroid}
       />

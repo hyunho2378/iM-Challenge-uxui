@@ -1,6 +1,6 @@
 import { colors, typography, layout, spacing } from '../../tokens/tokens'
 
-const KEYWORDS = ['강릉 맛집', '카페', '편의점', '숙박', 'GS25', '순두부', '테라로사', '경포대']
+const KEYWORDS = ['대구 맛집', '카페', '편의점', '숙박', 'GS25', '순두부', '테라로사', '경포대']
 
 export default function PopularKeywords({ onKeywordClick }) {
   return (

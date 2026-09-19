@@ -11,6 +11,8 @@ import HomePage from './pages/HomePage'
 import StorePage from './pages/StorePage'
 import QRPage from './pages/QRPage'
 import ChargePage from './pages/ChargePage'
+import ChargeFreePage from './pages/ChargeFreePage'
+import AccountLinkPage from './pages/AccountLinkPage'
 import HistoryPage from './pages/HistoryPage'
 import ServiceEditPage from './pages/ServiceEditPage'
 import UsageGuidePage from './pages/UsageGuidePage'
@@ -68,6 +70,8 @@ function App() {
           {/* 결제/충전 */}
           <Route path="/qr" element={<QRPage />} />
           <Route path="/charge" element={<ChargePage />} />
+          <Route path="/charge-free" element={<ChargeFreePage />} />
+          <Route path="/account-link" element={<AccountLinkPage />} />
           <Route path="/history" element={<HistoryPage />} />
 
           {/* 서비스 안내 */}

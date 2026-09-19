@@ -10,12 +10,12 @@ import { usePlatform } from '../hooks/usePlatform'
 
 const MOCK_STORES = [
   { id: 1, name: '초당순두부', category: '음식점', distance: '0.3km' },
-  { id: 2, name: '강릉중앙시장', category: '마트', distance: '1.1km' },
+  { id: 2, name: '서문시장', category: '마트', distance: '1.1km' },
   { id: 3, name: '보헤미안커피', category: '카페', distance: '0.8km' },
-  { id: 4, name: '테라로사 강릉 본점', category: '카페', distance: '0.4km' },
-  { id: 5, name: '강릉 GS25 경포점', category: '편의점', distance: '0.5km' },
+  { id: 4, name: '테라로사 대구 본점', category: '카페', distance: '0.4km' },
+  { id: 5, name: 'GS25 동성로점', category: '편의점', distance: '0.5km' },
   { id: 6, name: '경포해변 쏠비치', category: '숙박', distance: '1.2km' },
-  { id: 7, name: '강릉관광안내소', category: '관광', distance: '0.7km' },
+  { id: 7, name: '대구관광안내소', category: '관광', distance: '0.7km' },
 ]
 
 export default function SearchPage() {

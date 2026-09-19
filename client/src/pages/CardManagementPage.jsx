@@ -157,7 +157,7 @@ function CardThumbSVG() {
   return (
     <svg width="84" height="56" viewBox="0 0 100 64" fill="none" style={{ transform: 'rotate(-6deg)', flexShrink: 0 }}>
       <rect width="100" height="64" rx="8" fill={colors.surface.card} fillOpacity="0.95" />
-      <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">iM샵</text>
+      <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">대구로페이</text>
       <rect x="8" y="32" width="26" height="16" rx="3" fill={colors.gray[200]} />
       <rect x="8" y="54" width="14" height="3" rx="1.5" fill={colors.gray[300]} />
     </svg>

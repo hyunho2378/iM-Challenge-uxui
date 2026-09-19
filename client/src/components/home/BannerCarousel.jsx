@@ -48,13 +48,13 @@ const BASE_SLIDES = [
     buttonBg: colors.primary[200],
     buttonTextColor: colors.primary[800],
     title: '캐시백 충전하고',
-    description: '강릉 전역에서 사용하세요',
+    description: '대구 전역에서 사용하세요',
     buttonLabel: '충전하기',
     buttonPath: '/charge',
     illustration: (
       <svg width="76" height="64" viewBox="0 0 100 64" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ transform: 'rotate(-8deg)' }}>
         <rect x="0" y="0" width="100" height="64" rx="8" fill={colors.surface.card} />
-        <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">iM샵</text>
+        <text x="8" y="22" fontSize="13" fontWeight="700" fill={colors.primary[700]} fontFamily="sans-serif">대구로페이</text>
         <rect x="8" y="32" width="26" height="16" rx="3" fill={colors.gray[200]} />
         <rect x="8" y="54" width="14" height="3" rx="1.5" fill={colors.gray[300]} />
       </svg>
@@ -67,7 +67,7 @@ const CARD_APPLY_SLIDE = {
   bgColor: colors.primary[700],
   textColor: colors.onDark.primary,
   subTextColor: 'rgba(255,255,255,0.85)',
-  title: '강릉 곳곳에서 10% 캐시백',
+  title: '대구 곳곳에서 10% 캐시백',
   description: '신청만 하면 바로 적용',
   buttonLabel: '신청하기',
   buttonPath: '/card-apply',
@@ -218,27 +218,42 @@ export default function BannerCarousel({ applyButtonRef }) {
         ))}
       </div>
 
-      {/* dot 인디케이터 — 슬라이드 트랙 위 오버레이 */}
+      {/* dot 인디케이터 — 04차 대기 항목: 자동회전을 껐으니 탭으로도 이동 가능해야 한다.
+          점 자체는 6px지만 버튼 히트 영역을 32px로 넓힌다. 슬라이드 수가 많아 48px씩 주면
+          서로 겹치므로(MIFB 충돌 규칙) 겹치지 않는 한도 안에서 최대로 키운 값이다. */}
       <div style={{
         position: 'absolute',
         bottom: spacing[2],
         left: '50%',
         transform: 'translateX(-50%)',
         display: 'flex',
-        gap: spacing[1],
         alignItems: 'center',
-        pointerEvents: 'none',
       }}>
         {slides.map((_, idx) => (
-          <div
+          <button
             key={idx}
+            onClick={() => { setCurrentIndex(idx) }}
+            aria-label={`${idx + 1}번째 배너로 이동`}
             style={{
+              position: 'relative',
+              width: '32px',
+              height: '32px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <span style={{
               width: idx === safeIndex ? '18px' : '6px',
               height: '6px',
               borderRadius: layout.radiusPill,
               backgroundColor: idx === safeIndex ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.45)',
-            }}
-          />
+            }} />
+          </button>
         ))}
       </div>
     </div>
