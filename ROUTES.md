@@ -1,6 +1,6 @@
 # ROUTES.md — iM샵(대구로페이) 라우팅 구조
 
-05차 지시서 기준 재작성. `App.jsx`를 소스 오브 트루스로 삼는다. 강릉 전용 라우트(`/life`,`/support`,`/community`,`/cashback`,`/kakao-guide`,`/transport-card`,`/chatbot`,`/donation*`,`/news*` 등 iM샵에 대응 화면이 없는 것)는 전부 제거했다.
+`App.jsx`를 소스 오브 트루스로 삼는다. iM샵에 대응 화면이 없는 라우트(`/life`,`/support`,`/community`,`/cashback`,`/kakao-guide`,`/transport-card`,`/chatbot`,`/donation*`,`/news*` 등)는 전부 제거했다.
 
 ## 바텀 네비게이션 (5탭, 신규)
 
@@ -59,7 +59,7 @@ iM샵 실제 구조는 바텀 내비게이션이 없고 햄버거 드로어 하�
 |----------|------|------|
 | 신규 | `/account-link` | 연결계좌 은행/증권 선택. iM샵 원본(PAY-01)엔 검색이 없었으나 to-be 개선으로 검색 추가. AI 개입지점 1 포함 |
 | 신규 | `/charge-free` | 할인없이 충전(무혜택). 정상 충전(`/charge`)에서 할인기간 아님 에러 시 이 화면으로 유도(AI 개입지점 2) |
-| 콘텐츠 전면 교체 | `/customer-center` | 강릉 FAQ 5개 링크 목록 → iM샵 실제 FAQ 19문항 아코디언(카테고리 칩 포함) |
+| 콘텐츠 전면 교체 | `/customer-center` | FAQ 링크 목록 → iM샵 실제 FAQ 19문항 아코디언(카테고리 칩 포함) |
 | 라우트 정리 | — | `/life`,`/support`,`/community`,`/cashback`,`/kakao-guide`,`/transport-card`,`/chatbot`,`/support/:id`,`/support-wish`,`/custom-info`,`/donation`,`/donation/:id`,`/donation-history`,`/news`,`/news/:id`,`/place/:id` 제거(iM샵에 대응 화면 없음, 이미 App.jsx에 없던 문서상 유령 라우트) |
 | 바텀탭 변경 | — | `지원금·혜택` 탭 제거, 5탭을 홈/충전·결제/이용내역/SHOP·쿠폰/MY로 재편 |
 
