@@ -17,9 +17,14 @@ body.platform-android * {
 /* 반대 방향도 필요하다.
    안드로이드 빌드에서 이 문서를 열면 body.platform-android가 iOS 컬럼까지
    Noto Sans KR로 덮어버려 비교가 성립하지 않는다. iOS 컬럼은 원래 스택으로 되돌린다.
-   값은 tokens.js typography.fontFamily와 같은 순서다. */
-.ds-force-apple,
-.ds-force-apple * {
+   값은 tokens.js typography.fontFamily와 같은 순서다.
+   둘 다 !important라 특이도로 이겨야 한다.
+   body.platform-android *는 (0,1,1)이라 .ds-force-apple *(0,1,0)로는 지고 들어간다.
+   body.platform-android를 앞에 붙여 (0,2,1)로 올린다. */
+body .ds-force-apple,
+body .ds-force-apple *,
+body.platform-android .ds-force-apple,
+body.platform-android .ds-force-apple * {
   font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', sans-serif !important;
 }
 
