@@ -175,6 +175,7 @@ export default function StoreMapScreen() {
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY ?? '',
+    // 키가 없으면 지도 타일만 빠진다. 목록과 필터와 상세 시트는 그대로 동작한다.
   })
 
   // Pre-compute nearby stores once on mount
