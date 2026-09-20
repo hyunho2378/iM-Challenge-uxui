@@ -218,7 +218,6 @@ export default function CardApplyPage() {
   const sizes = useTypography()
   const { cardStatus, applyCard, shipCard, registerCard } = useUser()
   const { hasSeenCardApplyFlowCoach, markSeen } = useOnboarding()
-  const BENEFITS = getBenefits(sizes, selectedCard.id)
   // 06차 2번: 처음 보는 사용자에게 단계별로 뭘 눌러야 할지 짚어준다
   const applyBtnRef = useRef(null)
   const registerBtnRef = useRef(null)
@@ -231,6 +230,10 @@ export default function CardApplyPage() {
     }
   }, [cardStatus, shipCard])
   const [cardIndex, setCardIndex] = useState(0)
+  // 카드 선택에 따라 혜택 문구(한도·할인액)가 갈리므로 selectedCard 선언 뒤에 계산한다.
+  // 이 순서를 앞으로 옮기면 TDZ로 즉시 크래시한다(2026-09-20 실제 장애 원인).
+  const selectedCardForBenefits = CARD_TYPES[cardIndex]
+  const BENEFITS = getBenefits(sizes, selectedCardForBenefits.id)
   const [cardCode, setCardCode] = useState('')
   const [accordionOpen, setAccordionOpen] = useState(false)
 
