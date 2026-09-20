@@ -159,6 +159,13 @@ export const colors = {
     primary: '#FFFFFF',
     secondary: 'rgba(255,255,255,0.7)',
   },
+
+  // 코치마크 오버레이. CoachMarkOverlay와 /design-system 문서가 같은 값을 다로 쓰고
+  // 있었지만 양족 파일에 수자를 박아뗐 둔 상황이었다. 하나로 모으는다.
+  coach: {
+    dim: 'rgba(0,0,0,0.65)',
+    spotBorder: 'rgba(255,255,255,0.55)',
+  },
 };
 
 // ─── MD3 타입스케일 (안드로이드 브랜치 기준, rem) ─────────────────────────────

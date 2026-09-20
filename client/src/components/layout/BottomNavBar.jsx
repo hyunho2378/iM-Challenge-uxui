@@ -79,7 +79,7 @@ export default function BottomNavBar() {
         isAndroid={isAndroid}
       />
       <NavTab
-        label="지원금·혜택"
+        label="지원금과 혜택"
         icon={<Gift size={24} strokeWidth={1.8} />}
         active={activeKey === 'benefits'}
         onClick={() => navigate('/benefits')}

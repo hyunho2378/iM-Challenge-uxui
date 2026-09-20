@@ -40,7 +40,12 @@ import DesignSystemPage from './pages/DesignSystemPage'
 // 08차 2번: 딥링크/새로고침마다 게이트가 다시 뜨는 게 "안 넘어간다"는 인상을 줬다.
 // sessionStorage는 프로젝트 규칙상 허용 대상이라 탭을 유지하는 동안은 한 번 통과하면 다시 묻지 않는다.
 function readGatePassed() {
-  try { return sessionStorage.getItem('gnp_gate_passed') === '1' } catch (e) { return false }
+  try {
+    // /design-system 문서에서 화면을 여는 링킬 누를 때마다 게이트부터 다시 보이면
+    // 그 화면을 바로 여는 목적을 달성하지 못한다. demo=1이 붙은 링킬만 게이트를 건넌다.
+    if (new URLSearchParams(window.location.search).get('demo') === '1') return true
+    return sessionStorage.getItem('gnp_gate_passed') === '1'
+  } catch (e) { return false }
 }
 
 function isDesignSystemRoute() {

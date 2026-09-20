@@ -33,7 +33,9 @@ const KEYPAD = [
   ['', '3', 'back'],
 ]
 
-export default function PaymentAuthOverlay({ open, onComplete, onCancel }) {
+// showSecureKeyboardNotice: 결제 흐름에서는 그대로 두고, /design-system 비교 화면에서만 끔다.
+// 생체인증 모양을 비교하는 자리에서 빨간 막대가 딱기 때문이다.
+export default function PaymentAuthOverlay({ open, onComplete, onCancel, showSecureKeyboardNotice = true }) {
   const [showFaceId, setShowFaceId] = useState(false)
   const [fadingOut, setFadingOut] = useState(false)
   const completedRef = useRef(false)
@@ -271,24 +273,26 @@ export default function PaymentAuthOverlay({ open, onComplete, onCancel }) {
         }}>
           {isAndroid ? '지문인증 사용하기' : '얼굴인증 사용하기'}
         </div>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: spacing[2],
-        }}>
+        {showSecureKeyboardNotice && (
           <div style={{
-            width: '12px',
-            height: '14px',
-            backgroundColor: colors.error,
-            borderRadius: '2px',
-          }} />
-          <span style={{
-            fontSize: typography.size.xs,
-            color: colors.gray[700],
+            display: 'flex',
+            alignItems: 'center',
+            gap: spacing[2],
           }}>
-            보안키보드 작동 중
-          </span>
-        </div>
+            <div style={{
+              width: '12px',
+              height: '14px',
+              backgroundColor: colors.error,
+              borderRadius: '2px',
+            }} />
+            <span style={{
+              fontSize: typography.size.xs,
+              color: colors.gray[700],
+            }}>
+              보안키보드 작동 중
+            </span>
+          </div>
+        )}
       </div>
 
       {/* 숫자 키패드 */}

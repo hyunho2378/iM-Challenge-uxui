@@ -110,7 +110,7 @@ export default function CoachMarkOverlay({ targetRef, message, step, totalSteps,
               width: relativeTarget.width + 12,
               height: relativeTarget.height + 12,
             }
-            const dim = 'rgba(0,0,0,0.65)'
+            const dim = colors.coach.dim
             const base = { position: 'absolute', backgroundColor: dim, pointerEvents: 'none' }
             return (
               <>
@@ -126,7 +126,7 @@ export default function CoachMarkOverlay({ targetRef, message, step, totalSteps,
                     width: hole.width,
                     height: hole.height,
                     borderRadius: isAndroid ? layout.radiusPill : layout.radiusButton,
-                    border: '2px solid rgba(255,255,255,0.55)',
+                    border: `2px solid ${colors.coach.spotBorder}`,
                     pointerEvents: 'none',
                   }}
                 />
@@ -138,7 +138,7 @@ export default function CoachMarkOverlay({ targetRef, message, step, totalSteps,
         <div style={{
           position: 'absolute',
           inset: 0,
-          backgroundColor: 'rgba(0,0,0,0.65)',
+          backgroundColor: colors.coach.dim,
           pointerEvents: 'none',
         }} />
       )}
