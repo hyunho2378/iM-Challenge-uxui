@@ -89,7 +89,14 @@ const CARD_TYPES = [
   },
 ]
 
-function getBenefits(sizes) {
+// 사실 근거(2026.09 확인):
+//  대구로페이  충전 즉시 10% 할인, 월 30만원, 소득공제 30%, 만 14세 이상 (대구시 보도 2026.1.26, iM샵 S09)
+//  포항사랑카드 충전 시 10% 할인, 월 40만원(포항시 2026.5~6 공지), 소득공제 30%
+//  "결제할 때마다 적립"은 사실이 아니라 "충전 즉시 할인"으로 정정했다.
+function getBenefits(sizes, cardId = 'daegu') {
+  const isPohang = cardId === 'pohang'
+  const limit = isPohang ? '40만원' : '30만원'
+  const maxOff = isPohang ? '4만원' : '3만원'
   return [
   {
     iconBg: colors.warmBg,
@@ -101,9 +108,9 @@ function getBenefits(sizes) {
     ),
     text: (
       <span>
-        결제할 때마다 <b>10%</b>
+        충전 즉시 <b>10%</b> 할인
         <br />
-        <span style={{ fontSize: sizes.xxs, color: colors.gray[500] }}>월 <b>최대 3만원</b> 적립</span>
+        <span style={{ fontSize: sizes.xxs, color: colors.gray[500] }}>월 <b>최대 {maxOff}</b> 할인</span>
       </span>
     ),
   },
@@ -119,7 +126,7 @@ function getBenefits(sizes) {
     ),
     text: (
       <span>
-        월 충전한도 <b>30만원</b>
+        월 충전한도 <b>{limit}</b>
       </span>
     ),
   },
@@ -211,7 +218,7 @@ export default function CardApplyPage() {
   const sizes = useTypography()
   const { cardStatus, applyCard, shipCard, registerCard } = useUser()
   const { hasSeenCardApplyFlowCoach, markSeen } = useOnboarding()
-  const BENEFITS = getBenefits(sizes)
+  const BENEFITS = getBenefits(sizes, selectedCard.id)
   // 06차 2번: 처음 보는 사용자에게 단계별로 뭘 눌러야 할지 짚어준다
   const applyBtnRef = useRef(null)
   const registerBtnRef = useRef(null)
