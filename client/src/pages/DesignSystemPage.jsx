@@ -13,9 +13,9 @@
 
 import { useState } from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { Search, Check, Utensils, Coffee } from 'lucide-react'
+import { Search, Utensils, Coffee } from 'lucide-react'
 
-import { colors, typography, layout, spacing, shadow, md3Shape } from '../tokens/tokens'
+import { colors, typography, layout, spacing, shadow } from '../tokens/tokens'
 import { PlatformOverrideContext } from '../hooks/usePlatform'
 import { useApp } from '../context/AppContext'
 
