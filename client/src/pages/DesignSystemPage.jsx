@@ -42,6 +42,9 @@ const SHELL = {
   // 좌측 라벨 열이 132px였을 때 설명 문장이 한 글자씩 세로로 쪼개졌다. 220px로 넓힌다.
   colGrid: 'minmax(220px, 240px) 1fr 1fr',
   colGap: 'clamp(16px, 1.6vw, 28px)',
+  // 항목 행의 흰 띠가 컨테이너 여백선에서 바로 시작해 글자가 띠 왼쪽 끝에 붙었다.
+  // 띠만 바깥으로 밀고 글자는 헤더와 같은 여백선에 그대로 둔다.
+  rowInset: 'clamp(16px, 1.6vw, 24px)',
 }
 
 function Platform({ value, children }) {
@@ -107,6 +110,9 @@ function ColumnHead() {
       columnGap: SHELL.colGap,
       borderBottom: `2px solid ${colors.gray[200]}`,
       paddingBottom: 12,
+      paddingLeft: SHELL.rowInset,
+      paddingRight: SHELL.rowInset,
+      margin: `0 calc(-1 * ${SHELL.rowInset})`,
     }}>
       <div />
       <div style={{ padding: `0 ${spacing[5]}`, fontSize: 14, fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: colors.primary[700] }}>
@@ -129,6 +135,9 @@ function Row({ index, name, summary, ios, android, iosFacts, androidFacts }) {
       borderBottom: `1px solid ${colors.gray[200]}`,
       backgroundColor: index % 2 === 0 ? colors.surface.card : 'transparent',
       alignItems: 'start',
+      paddingLeft: SHELL.rowInset,
+      paddingRight: SHELL.rowInset,
+      margin: `0 calc(-1 * ${SHELL.rowInset})`,
     }}>
       <div style={{ padding: `${SHELL.rowY} 0` }}>
         <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', color: colors.gray[400], margin: 0 }}>
