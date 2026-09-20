@@ -5,6 +5,15 @@ body.platform-android * {
   font-family: 'Noto Sans KR', sans-serif !important;
 }
 
+/* /design-system 비교 페이지 전용.
+   iOS 빌드 위에서 Android 컬럼을 보여줘야 하는데, 안드로이드 빌드의 폰트 강제는
+   body.platform-android에 걸려 있어 그대로는 재현되지 않는다.
+   위 규칙과 완전히 같은 선언을 컬럼 단위로만 건다. 앱 화면에는 이 클래스를 쓰지 않는다. */
+.ds-force-noto,
+.ds-force-noto * {
+  font-family: 'Noto Sans KR', sans-serif !important;
+}
+
 /* 색·폰트 토큰은 tokens.js가 단일 소스다.
    Tailwind @theme 블록은 이 프로젝트에서 className을 쓰지 않아 소비자가 없었고,
    tokens.js와 같은 색을 중복 정의해 리브랜딩 시 누락 위험만 만들었으므로 제거했다. */

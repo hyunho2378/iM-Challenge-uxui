@@ -23,3 +23,7 @@ npm-debug.log*
 
 # ─── 원본 캡처 (실명·전화번호 포함, 공개 저장소에 올리지 않음) ───
 docs/raw-screenshots/
+
+# 참고자료 아카이브 (제출용 저장소 히스토리에 넣지 않는다)
+Gangneung-Pay-main.zip
+*.zip

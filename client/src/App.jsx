@@ -32,6 +32,10 @@ import RefundPage from './pages/RefundPage'
 import BenefitsPage from './pages/BenefitsPage'
 import Snackbar from './components/common/Snackbar'
 import TermsPage from './pages/TermsPage'
+import DesignSystemPage from './pages/DesignSystemPage'
+
+// /design-system은 앱 화면이 아니라 문서 페이지다.
+// 본인인증 게이트 뒤에 두면 URL로 바로 열리지 않아 게이트 앞에서 갈라난다.
 
 // 08차 2번: 딥링크/새로고침마다 게이트가 다시 뜨는 게 "안 넘어간다"는 인상을 줬다.
 // sessionStorage는 프로젝트 규칙상 허용 대상이라 탭을 유지하는 동안은 한 번 통과하면 다시 묻지 않는다.
@@ -39,8 +43,14 @@ function readGatePassed() {
   try { return sessionStorage.getItem('gnp_gate_passed') === '1' } catch (e) { return false }
 }
 
+function isDesignSystemRoute() {
+  if (typeof window === 'undefined') return false
+  return window.location.pathname.replace(/\/$/, '') === '/design-system'
+}
+
 function App() {
   const [showSplash, setShowSplash] = useState(true)
+  const designSystem = isDesignSystemRoute()
   // 07차 2번: 스플래시-홈 사이 최소 본인인증 게이트. 라우터 밖에서 렌더해 딥링크/뒤로가기에 영향 없다.
   const [gatePassed, setGatePassed] = useState(readGatePassed)
 
@@ -54,7 +64,8 @@ function App() {
     // 색 단일 소스 유지: CSS는 토큰을 읽을 수 없으므로 body 배경을 여기서 주입한다
     // 08차 8번: 폰 프레임 바깥(데스크탑 시연) 배경을 검정으로. surface.background(#F2F4F8)는
     // 화면 내부 콘텐츠 배경으로 계속 쓰이므로 토큰 자체는 건드리지 않는다.
-    document.body.style.backgroundColor = colors.gray[900]
+    // /design-system은 폰 프레임이 없는 문서 페이지라 검정 바탕을 쓰지 않는다.
+    document.body.style.backgroundColor = isDesignSystemRoute() ? '#FFFFFF' : colors.gray[900]
     // 08차 4번: 리퀴드글래스 제거로 유리 토큰 주입도 함께 뺐다. 줄간격 변수만 남는다
     document.documentElement.style.setProperty('--app-line-height', String(typography.lineHeight.body))
   }, [])
@@ -64,7 +75,8 @@ function App() {
     return () => clearTimeout(timer)
   }, [])
 
-  if (showSplash) {
+  // 문서 페이지는 스플래시 없이 바로 연다.
+  if (showSplash && !designSystem) {
     return (
       // 08차 6번: 스플래시 배경을 흰색으로 되돌리면서 상태바도 밝은 배경/어두운 아이콘으로 맞춘다
       <ScreenContainer statusBarBg={colors.surface.card}>
@@ -79,7 +91,9 @@ function App() {
     <AppProvider>
       <UserProvider>
       <OnboardingProvider>
-      {!gatePassed ? (
+      {designSystem ? (
+        <DesignSystemPage />
+      ) : !gatePassed ? (
         <ScreenContainer statusBarBg={colors.surface.card}>
           <AuthGateScreen onDone={passGate} onSkip={passGate} />
         </ScreenContainer>

@@ -1,5 +1,7 @@
 // hooks/usePlatform.js
 // 플랫폼 분기 훅 — iOS HIG / Android MD3
+
+import { createContext, useContext } from 'react'
 //
 // 우선순위:
 //   1. VITE_PLATFORM 환경변수 (Vercel 배포 시 플랫폼 고정)
@@ -37,9 +39,15 @@ export function applyPlatformClass() {
     document.body.classList.add(`platform-${platform}`)
 }
 
+// 한 페이지에서 iOS/Android를 나란히 보여줘야 하는 경우(/design-system 비교 페이지)만
+// 특정 서브트리의 플랫폼을 강제하기 위한 오버라이드.
+// 기본값이 null이라 앞서 쓴 모든 화면은 그대로 getPlatform()을 따른다(동작 변경 없음).
+export const PlatformOverrideContext = createContext(null)
+
 // React 훅 형태 (컴포넌트에서 사용)
 export function usePlatform() {
-    return getPlatform()
+    const override = useContext(PlatformOverrideContext)
+    return override ?? getPlatform()
 }
 
 export const isAndroid = () => getPlatform() === 'android'
