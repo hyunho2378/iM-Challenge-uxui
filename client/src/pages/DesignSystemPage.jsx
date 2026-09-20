@@ -39,7 +39,9 @@ const SHELL = {
   gut: 'clamp(20px, 5vw, 80px)',
   sectionY: 'clamp(40px, 5vw, 72px)',
   rowY: 'clamp(20px, 2.4vw, 32px)',
-  colGrid: '132px 1fr 1fr',
+  // 좌측 라벨 열이 132px였을 때 설명 문장이 한 글자씩 세로로 쪼개졌다. 220px로 넓힌다.
+  colGrid: 'minmax(220px, 240px) 1fr 1fr',
+  colGap: 'clamp(16px, 1.6vw, 28px)',
 }
 
 function Platform({ value, children }) {
@@ -102,6 +104,7 @@ function ColumnHead() {
     <div style={{
       display: 'grid',
       gridTemplateColumns: SHELL.colGrid,
+      columnGap: SHELL.colGap,
       borderBottom: `2px solid ${colors.gray[200]}`,
       paddingBottom: 12,
     }}>
@@ -122,6 +125,7 @@ function Row({ index, name, summary, ios, android, iosFacts, androidFacts }) {
     <div style={{
       display: 'grid',
       gridTemplateColumns: SHELL.colGrid,
+      columnGap: SHELL.colGap,
       borderBottom: `1px solid ${colors.gray[200]}`,
       backgroundColor: index % 2 === 0 ? colors.surface.card : 'transparent',
       alignItems: 'start',
@@ -289,7 +293,7 @@ export default function DesignSystemPage() {
   const rows = [
     {
       name: '상태바',
-      summary: '두 플랫폼이 서로 다른 컴포넌트를 쓴다. 시계 크기와 자간이 각 OS 기본값을 따른다.',
+      summary: '높이와 시계 크기가 각 OS 기본값',
       ios: <Stage height={78} bg={colors.surface.card}><StatusBar backgroundColor={colors.surface.card} /></Stage>,
       android: <Stage height={78} android bg={colors.surface.card}><StatusBarAndroid backgroundColor={colors.surface.card} /></Stage>,
       iosFacts: [['높이', '41px'], ['시계', '17px'], ['자간', '-0.5px'], ['위치', 'left 13%']],
@@ -297,7 +301,7 @@ export default function DesignSystemPage() {
     },
     {
       name: '상단바',
-      summary: '제목 정렬이 다르다. 뒤로가기 아이콘과 터치 영역은 두 플랫폼이 같다.',
+      summary: '제목 정렬 차이와 공통 뒤로가기',
       ios: <Stage height={88} bg={colors.surface.card}><MemoryRouter><Platform value={IOS}><TopAppBarBack title="서비스 바로가기 편집" /></Platform></MemoryRouter></Stage>,
       android: <Stage height={88} android bg={colors.surface.card}><MemoryRouter><Platform value={AND}><TopAppBarBack title="서비스 바로가기 편집" /></Platform></MemoryRouter></Stage>,
       iosFacts: [['제목', '가운데'], ['여백', 'right 48px'], ['아이콘', 'ArrowLeft 22'], ['터치', '48 x 48']],
@@ -305,7 +309,7 @@ export default function DesignSystemPage() {
     },
     {
       name: '버튼',
-      summary: '위계 네 종류를 양쪽이 같이 쓰지만 모서리와 높이와 그림자가 다르다.',
+      summary: '모서리와 높이와 그림자 차이',
       ios: (
         <Stage height={300} bg={colors.surface.card}>
           <Platform value={IOS}>
@@ -335,7 +339,7 @@ export default function DesignSystemPage() {
     },
     {
       name: '폰트',
-      summary: '안드로이드 빌드는 본문 글꼴을 전역으로 덮어쓴다. 같은 문장이 서로 다른 글꼴로 나온다.',
+      summary: '본문 글꼴 전역 교체',
       ios: (
         <Stage height={170} bg={colors.surface.card}>
           <div style={{ padding: spacing[5] }}>
@@ -359,7 +363,7 @@ export default function DesignSystemPage() {
     },
     {
       name: '바텀내비',
-      summary: '지금 어느 탭에 있는지 알리는 방법이 다르다. iOS는 아이콘을 채우고 안드로이드는 아이콘 뒤에 알약을 깐다. 탭을 눌러보면 표시가 따라 움직인다.',
+      summary: '활성 탭 표시 방식 차이',
       ios: <Stage height={130} bg={colors.surface.card}><MemoryRouter initialEntries={['/store']}><Platform value={IOS}><BottomNavBar /></Platform></MemoryRouter></Stage>,
       android: <Stage height={130} android bg={colors.surface.card}><MemoryRouter initialEntries={['/store']}><Platform value={AND}><BottomNavBar /></Platform></MemoryRouter></Stage>,
       iosFacts: [['활성 표시', '아이콘 채움'], ['탭 높이', '49px'], ['모션', '없음']],
@@ -367,7 +371,7 @@ export default function DesignSystemPage() {
     },
     {
       name: '검색창',
-      summary: 'iOS는 테두리가 둘러싼 알약이고 안드로이드는 아래 밑줄로 입력 자리를 알린다. 안드로이드는 글자를 넣는 동안 밑줄 색이 바뀐다.',
+      summary: '입력 자리 표시 방식 차이',
       ios: <Stage height={100} bg={colors.surface.card}><SearchField android={false} /></Stage>,
       android: (
         <Stage height={100} android bg={colors.surface.card}>
@@ -380,7 +384,7 @@ export default function DesignSystemPage() {
     },
     {
       name: '필터칩',
-      summary: '고른 칩을 알리는 방법이 가장 크게 갈린다. 안드로이드는 체크 표시를 더 붙인다. 칩을 눌러 바꿔볼 수 있다.',
+      summary: '선택 표시와 체크 표시 차이',
       ios: (
         <Stage height={120} bg={colors.surface.card}>
           <Platform value={IOS}>
@@ -410,7 +414,7 @@ export default function DesignSystemPage() {
     },
     {
       name: '바텀시트',
-      summary: '올라오는 시트의 모서리와 뒤를 덮는 막의 짙기가 다르다. 위에 붙는 손잡이 길이도 다르다.',
+      summary: '모서리와 막 짙기와 손잡이 차이',
       ios: (
         <Stage height={260}>
           <Platform value={IOS}>
@@ -438,7 +442,7 @@ export default function DesignSystemPage() {
     },
     {
       name: '스낵바',
-      summary: 'iOS 자리는 비어 있는 상태가 맞다. 안드로이드에만 알림 띠가 올라오고 잠시 뒤 사라진다. 아래 버튼으로 띄워볼 수 있다.',
+      summary: 'Android 전용 알림 띠',
       ios: (
         <Stage height={150}>
           <Platform value={IOS}><Snackbar /></Platform>
@@ -455,7 +459,7 @@ export default function DesignSystemPage() {
     },
     {
       name: '코치마크',
-      summary: '안내 구조는 같고 모서리만 각 플랫폼 모양을 따른다.',
+      summary: '모서리만 다른 동일 구조',
       ios: <Stage height={300} bg={colors.surface.card}><CoachMark android={false} /></Stage>,
       android: <Stage height={300} android bg={colors.surface.card}><CoachMark android /></Stage>,
       iosFacts: [['구멍 모서리', '12px'], ['버튼 모서리', '12px'], ['막', '0.65']],
@@ -463,7 +467,7 @@ export default function DesignSystemPage() {
     },
     {
       name: '생체인증',
-      summary: '각 OS가 쓰는 잠금 해제 방식을 그대로 따른다. iOS는 얼굴 인식이 화면 가운데에서 돌고 안드로이드는 지문이 손가락 닿는 아래쪽에서 돈다.',
+      summary: '얼굴 인식과 지문의 위치 차이',
       ios: <AuthStage android={false} />,
       android: <AuthStage android />,
       iosFacts: [['수단', '얼굴 인식'], ['자리', '가운데'], ['보조 문구', '없음']],
