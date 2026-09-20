@@ -51,7 +51,9 @@ function Frame({ height = 220, children, forceNoto = false, bg = colors.surface.
   return (
     <div
       id={id}
-      className={forceNoto ? 'ds-force-noto' : undefined}
+      // iOS 컬럼에도 명시적으로 클래스를 건다.
+      // 안드로이드 빌드에서 이 문서를 열면 전역 폰트 강제가 iOS 컬럼까지 먹어버린다.
+      className={forceNoto ? 'ds-force-noto' : 'ds-force-apple'}
       style={{
         position: 'relative',
         transform: 'translateZ(0)',

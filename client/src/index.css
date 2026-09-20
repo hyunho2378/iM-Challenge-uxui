@@ -14,6 +14,15 @@ body.platform-android * {
   font-family: 'Noto Sans KR', sans-serif !important;
 }
 
+/* 반대 방향도 필요하다.
+   안드로이드 빌드에서 이 문서를 열면 body.platform-android가 iOS 컬럼까지
+   Noto Sans KR로 덮어버려 비교가 성립하지 않는다. iOS 컬럼은 원래 스택으로 되돌린다.
+   값은 tokens.js typography.fontFamily와 같은 순서다. */
+.ds-force-apple,
+.ds-force-apple * {
+  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Noto Sans KR', sans-serif !important;
+}
+
 /* 색·폰트 토큰은 tokens.js가 단일 소스다.
    Tailwind @theme 블록은 이 프로젝트에서 className을 쓰지 않아 소비자가 없었고,
    tokens.js와 같은 색을 중복 정의해 리브랜딩 시 누락 위험만 만들었으므로 제거했다. */
